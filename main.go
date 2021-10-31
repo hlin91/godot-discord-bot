@@ -82,16 +82,6 @@ var (
 )
 
 func main() {
-	// rss.GetLatest() // Should cause the next call to return nothing
-	// result := rss.GetLatest()
-	// for feed, items := range result {
-	// 	for _, i := range items {
-	// 		fmt.Println(i.Title)
-	// 		fmt.Println(i.Link)
-	// 		imgs, _ := rss.GetImages(i.Link, feed.Class, feed.NumImages)
-	// 		fmt.Println(imgs)
-	// 	}
-	// }
 	var session *discordgo.Session
 	done := make(chan interface{})
 	ret := make(chan interface{})
