@@ -30,18 +30,6 @@ func itemInList(list []*gofeed.Item, item *gofeed.Item) bool {
 	return false
 }
 
-// Count the number of children the node has
-func countChildren(root *html.Node) int {
-	if root == nil {
-		return 0
-	}
-	result := 0
-	for c := root.FirstChild; c != nil; c = c.NextSibling {
-		result += 1 + countChildren(c)
-	}
-	return result
-}
-
 // Recursively search for images in the html tree
 func getImagesHelp(node *html.Node, dataType string, linksFound []string, n int) []string {
 	if node == nil {

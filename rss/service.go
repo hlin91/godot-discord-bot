@@ -31,7 +31,7 @@ func init() {
 
 // ClearHistory clears the recently seen lists
 func ClearHistory() {
-	for key, _ := range seen {
+	for key := range seen {
 		seen[key] = []*gofeed.Item{}
 	}
 }

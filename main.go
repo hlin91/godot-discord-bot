@@ -74,7 +74,7 @@ var (
 			}
 			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
 				Embeds: []*discordgo.MessageEmbed{
-					itemToEmbed(item, images),
+					rss.ItemToEmbed(item, images),
 				},
 			})
 		},
@@ -92,7 +92,7 @@ func main() {
 	session.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
 		log.Println("starting rss listener...")
 		tick := time.NewTicker(WAIT_TIME)
-		go rssProcess(s, tick, done, ret)
+		go rss.ListenerProcess(s, getChannelID(), tick, done, ret)
 	})
 	session.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
