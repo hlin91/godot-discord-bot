@@ -37,7 +37,7 @@ func ItemToEmbed(item *gofeed.Item, images []string) *discordgo.MessageEmbed {
 
 // ListenerProcess listens for new RSS posts until a stop signal is sent
 func ListenerProcess(d *discordgo.Session, channelID string, t *time.Ticker, done chan interface{}, ret chan interface{}) {
-	//GetLatest() // Initialize the seen posts
+	GetLatest() // Initialize the seen posts
 	for {
 		select {
 		case <-done:
