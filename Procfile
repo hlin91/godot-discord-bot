@@ -1,1 +1,1 @@
-worker: go run
+worker: go build && ./godot
