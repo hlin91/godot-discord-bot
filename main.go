@@ -9,6 +9,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/harvlin/godot/rss"
+	"github.com/harvlin/godot/voice"
 	"github.com/mmcdole/gofeed"
 )
 
@@ -40,6 +41,14 @@ var (
 		{
 			Name:        "test_rss",
 			Description: "Test the RSS feed feature by posting an RSS post to the channel",
+		},
+		{
+			Name:        "join",
+			Description: "Sync up and discuss the latest code changes",
+		},
+		{
+			Name:        "leave",
+			Description: "Just got paged",
 		},
 	}
 	commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
@@ -78,6 +87,87 @@ var (
 				},
 			})
 		},
+		"join": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "Joining voice channel...",
+					// Flags:   1 << 6, // Ephemeral reply
+				},
+			})
+			if err != nil {
+				s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
+					Content: "Something went wrong",
+				})
+				return
+			}
+			if i.Member == nil {
+				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+					Content: "This command is only valid in guilds",
+				})
+				return
+			}
+			// g, err := s.Guild(i.GuildID)
+			// if err != nil {
+			// 	log.Println(err)
+			// 	s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+			// 		Content: "Failed to retrieve guild",
+			// 	})
+			// 	return
+			// }
+			// var vs *discordgo.VoiceState
+			// for _, v := range g.VoiceStates {
+			// 	log.Println(v.UserID + " | " + i.Member.User.ID)
+			// 	if v.UserID == i.Member.User.ID {
+			// 		vs = v
+			// 		break
+			// 	}
+			// }
+			vs, err := s.State.VoiceState(i.GuildID, i.Member.User.ID)
+			if err != nil {
+				log.Println(err)
+				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+					Content: "Could not grab voice state for user",
+				})
+				return
+			}
+			err = voice.JoinVoice(s, i.GuildID, vs.ChannelID)
+			if err != nil {
+				log.Println(err)
+				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+					Content: "Could not join voice channel",
+				})
+				return
+			}
+			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+				Content: "我来了。",
+			})
+		},
+		"leave": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "",
+				},
+			})
+			if err != nil {
+				s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
+					Content: "Something went wrong",
+				})
+				return
+			}
+			err = voice.LeaveVoice(s, i.GuildID)
+			if err != nil {
+				log.Println(err)
+				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+					Content: "Failed to leave voice channel",
+				})
+				return
+			}
+			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+				Content: "Getting paged",
+			})
+		},
 	}
 )
 
@@ -93,12 +183,14 @@ func main() {
 		log.Println("starting rss listener...")
 		tick := time.NewTicker(WAIT_TIME)
 		go rss.ListenerProcess(s, getChannelID(), tick, done, ret)
+		log.Println("bot is running...")
 	})
 	session.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
 			h(s, i)
 		}
 	})
+	session.Identify.Intents = discordgo.IntentsAll
 	err = session.Open()
 	if err != nil {
 		log.Fatalf("could not open bot session: %v", err)
@@ -110,7 +202,6 @@ func main() {
 			log.Panicf("could not create '%v' command: %v", v.Name, err)
 		}
 	}
-	session.Identify.Intents = discordgo.IntentsAll
 	stop := make(chan os.Signal)
 	signal.Notify(stop, os.Interrupt)
 	<-stop
