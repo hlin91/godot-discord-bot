@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	WAIT_TIME = 1 * time.Minute
+	WAIT_TIME = 10 * time.Minute
 )
 
 // Parameters
