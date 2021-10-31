@@ -11,11 +11,17 @@ import (
 // ItemToEmbed creates an embed from a function
 func ItemToEmbed(item *gofeed.Item, images []string) *discordgo.MessageEmbed {
 	logo, _ := GetImages(item.Link, "", 1)
+	if len(logo) == 0 {
+		logo = append(logo, "")
+	}
+	if len(images) == 0 {
+		images = append(images, "")
+	}
 	return &discordgo.MessageEmbed{
 		URL:         item.Link,
 		Type:        discordgo.EmbedTypeArticle,
-		Title:       "<a:newspaper:793257230618460160> **| Hot off the press**\n" + item.Title,
-		Description: item.Description,
+		Title:       "<a:newspaper:793257230618460160> **| Hot off the press**\n\n" + item.Title,
+		Description: item.PublishedParsed.Format(time.ANSIC) + "\n\n" + item.Description,
 		Author: &discordgo.MessageEmbedAuthor{
 			Name: item.Author.Name,
 		},
@@ -31,7 +37,7 @@ func ItemToEmbed(item *gofeed.Item, images []string) *discordgo.MessageEmbed {
 
 // ListenerProcess listens for new RSS posts until a stop signal is sent
 func ListenerProcess(d *discordgo.Session, channelID string, t *time.Ticker, done chan interface{}, ret chan interface{}) {
-	GetLatest() // Initialize the seen posts
+	//GetLatest() // Initialize the seen posts
 	for {
 		select {
 		case <-done:

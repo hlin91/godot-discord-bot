@@ -8,7 +8,7 @@ import (
 )
 
 func getImageFormats() []string {
-	return []string{".jpg", ".png"}
+	return []string{".jpg", ".png", ".jpeg"}
 }
 
 func isImageFormat(s string) bool {
