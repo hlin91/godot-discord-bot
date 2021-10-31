@@ -18,7 +18,6 @@ const (
 
 // Parameters
 var (
-	BotToken       = flag.String("t", "", "Bot access token")
 	RemoveCommands = flag.Bool("rmcmd", true, "Remove all commands after shutdowning or not")
 )
 
@@ -96,7 +95,7 @@ func main() {
 	var session *discordgo.Session
 	done := make(chan interface{})
 	ret := make(chan interface{})
-	session, err := discordgo.New("Bot " + *BotToken)
+	session, err := discordgo.New("Bot " + getBotToken())
 	if err != nil {
 		log.Fatalf("could not create discord session: %v", err)
 	}

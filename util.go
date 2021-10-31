@@ -18,6 +18,10 @@ func getChannelID() string {
 	return os.Getenv("ChannelID")
 }
 
+func getBotToken() string {
+	return os.Getenv("BotToken")
+}
+
 // Create an embed from a function
 func itemToEmbed(item *gofeed.Item, images []string) *discordgo.MessageEmbed {
 	logo, _ := rss.GetImages(item.Link, "", 1)
