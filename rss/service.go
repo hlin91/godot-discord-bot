@@ -63,8 +63,10 @@ func GetLatest() map[Feed][]*gofeed.Item {
 	}
 	// Update our seen items
 	for feed, items := range result {
-		// Push the new items to the back of the seen list and rotate left accordingly
-		seen[feed] = append(result[feed], items[:(len(items)-len(result))]...)
+		// Push the new items to the front of the seen list
+		seen[feed] = []*gofeed.Item{}
+		seen[feed] = append(seen[feed], result[feed]...)
+		seen[feed] = append(seen[feed], items[:(len(items)-len(result))]...)
 	}
 	return result
 }
