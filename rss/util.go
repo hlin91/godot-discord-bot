@@ -23,7 +23,7 @@ func isImageFormat(s string) bool {
 
 func itemInList(list []*gofeed.Item, item *gofeed.Item) bool {
 	for _, i := range list {
-		if i.Title == item.Title {
+		if i.Title == item.Title || i.Published == item.Published {
 			return true
 		}
 	}
