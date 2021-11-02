@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	WAIT_TIME = 10 * time.Minute
+	WAIT_TIME = 20 * time.Minute
 )
 
 // Parameters
@@ -107,22 +107,6 @@ var (
 				})
 				return
 			}
-			// g, err := s.Guild(i.GuildID)
-			// if err != nil {
-			// 	log.Println(err)
-			// 	s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-			// 		Content: "Failed to retrieve guild",
-			// 	})
-			// 	return
-			// }
-			// var vs *discordgo.VoiceState
-			// for _, v := range g.VoiceStates {
-			// 	log.Println(v.UserID + " | " + i.Member.User.ID)
-			// 	if v.UserID == i.Member.User.ID {
-			// 		vs = v
-			// 		break
-			// 	}
-			// }
 			vs, err := s.State.VoiceState(i.GuildID, i.Member.User.ID)
 			if err != nil {
 				log.Println(err)
