@@ -54,7 +54,10 @@ func GetLatest() map[Feed][]*gofeed.Item {
 			log.Print(err)
 			continue
 		}
-		items := feed.Items[0:MAX_ITEMS]
+		items := feed.Items
+		if len(items) > MAX_ITEMS {
+			items = items[:MAX_ITEMS]
+		}
 		for _, i := range items {
 			if !itemInList(seen[f], i) {
 				result[f] = append(result[f], i)

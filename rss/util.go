@@ -1,7 +1,6 @@
 package rss
 
 import (
-	"log"
 	"strings"
 
 	"github.com/mmcdole/gofeed"
@@ -26,8 +25,6 @@ func itemInList(list []*gofeed.Item, item *gofeed.Item) bool {
 	for _, i := range list {
 		if i.Title == item.Title {
 			return true
-		} else {
-			log.Printf("'%v' does not equal '%v\n", i.Title, item.Title)
 		}
 	}
 	return false
