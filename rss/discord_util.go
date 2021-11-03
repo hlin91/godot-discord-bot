@@ -9,8 +9,8 @@ import (
 )
 
 // ItemToEmbed creates an embed from a function
-func ItemToEmbed(item *gofeed.Item, images []string) *discordgo.MessageEmbed {
-	logo, _ := GetImages(item.Link, "", 1)
+func ItemToEmbed(item *gofeed.Item, images []string, logoClass string) *discordgo.MessageEmbed {
+	logo, _ := GetImages(item.Link, logoClass, 1)
 	if len(logo) == 0 {
 		logo = append(logo, "")
 	}
@@ -50,7 +50,7 @@ func ListenerProcess(d *discordgo.Session, channelID string, t *time.Ticker, don
 			for source, list := range items {
 				for _, i := range list {
 					images, _ := GetImages(i.Link, source.Class, source.NumImages)
-					d.ChannelMessageSendEmbed(channelID, ItemToEmbed(i, images))
+					d.ChannelMessageSendEmbed(channelID, ItemToEmbed(i, images, source.LogoClass))
 				}
 			}
 		}

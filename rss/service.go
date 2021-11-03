@@ -16,6 +16,7 @@ const (
 type Feed struct {
 	Url       string
 	Class     string
+	LogoClass string
 	NumImages int
 }
 
@@ -37,10 +38,11 @@ func ClearHistory() {
 }
 
 // AddFeed adds a url to the list of feeds to parse
-func AddFeed(url string, class string, n int) {
+func AddFeed(url string, class string, logo string, n int) {
 	feeds = append(feeds, Feed{
 		Url:       url,
 		Class:     class,
+		LogoClass: logo,
 		NumImages: n,
 	})
 }

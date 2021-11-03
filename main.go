@@ -27,8 +27,8 @@ func init() {
 }
 
 func init() {
-	rss.AddFeed(`http://fiu758.blog111.fc2.com/?xml`, "main_txt", 2)
-	rss.AddFeed(`http://2chav.com/?xml`, "kobetu_kiji", 2)
+	rss.AddFeed(`http://fiu758.blog111.fc2.com/?xml`, "main_txt", "sh_fc2blogheadbar_body", 2)
+	rss.AddFeed(`http://2chav.com/?xml`, "kobetu_kiji", "", 2)
 }
 
 // Declare our slash commands and their handlers
@@ -83,7 +83,7 @@ var (
 			}
 			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
 				Embeds: []*discordgo.MessageEmbed{
-					rss.ItemToEmbed(item, images),
+					rss.ItemToEmbed(item, images, ""),
 				},
 			})
 		},
