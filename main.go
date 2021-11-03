@@ -180,22 +180,31 @@ func main() {
 		log.Fatalf("could not open bot session: %v", err)
 	}
 	defer session.Close()
+	ug, err := session.UserGuilds(100, "", "")
+	if err != nil {
+		log.Panicf("could not retrieve user guilds: %v", err)
+	}
 	for _, v := range commands {
-		_, err := session.ApplicationCommandCreate(session.State.User.ID, getGuildID(), v)
-		if err != nil {
-			log.Panicf("could not create '%v' command: %v", v.Name, err)
+		for _, g := range ug {
+			_, err := session.ApplicationCommandCreate(session.State.User.ID, g.ID, v)
+			if err != nil {
+				log.Panicf("could not create '%v' command: %v", v.Name, err)
+			}
 		}
+
 	}
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt)
 	<-stop
 	log.Println("shutting down...")
 	if *RemoveCommands {
-		cmds, _ := session.ApplicationCommands(session.State.User.ID, getGuildID())
-		for _, v := range cmds {
-			err := session.ApplicationCommandDelete(session.State.User.ID, getGuildID(), v.ID)
-			if err != nil {
-				log.Panicf("could not delete '%v' command (id %v): %v", v.Name, v.ID, err)
+		for _, g := range ug {
+			cmds, _ := session.ApplicationCommands(session.State.User.ID, g.ID)
+			for _, v := range cmds {
+				err := session.ApplicationCommandDelete(session.State.User.ID, g.ID, v.ID)
+				if err != nil {
+					log.Panicf("could not delete '%v' command (id %v): %v", v.Name, v.ID, err)
+				}
 			}
 		}
 	}
