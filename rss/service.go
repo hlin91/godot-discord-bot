@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	MAX_ITEMS = 10
+	MAX_ITEMS = 15
 )
 
 type Feed struct {

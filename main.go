@@ -186,7 +186,7 @@ func main() {
 			log.Panicf("could not create '%v' command: %v", v.Name, err)
 		}
 	}
-	stop := make(chan os.Signal)
+	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt)
 	<-stop
 	log.Println("shutting down...")
