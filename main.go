@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -195,12 +196,14 @@ var (
 					Embeds: []*discordgo.MessageEmbed{info},
 				})
 			}
-			go func(url, gID string) {
+			go func(s *discordgo.Session, i *discordgo.InteractionCreate, url, gID string) {
 				err := voice.StreamUrl(url, gID)
 				if err != nil {
-					log.Panicf("error while streaming url %v: %v", url, err)
+					s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+						Content: fmt.Sprintf("Error occured during playback: %v", err),
+					})
 				}
-			}(i.ApplicationCommandData().Options[0].StringValue(), i.GuildID)
+			}(s, i, i.ApplicationCommandData().Options[0].StringValue(), i.GuildID)
 		},
 		"cease": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os/exec"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -15,7 +16,7 @@ const (
 	VIDEO_ID          = `v=[[:ascii:]]{11}`
 	VIDEO_TITLE       = `"title": ".+?"`
 	VIDEO_DESCRIPTION = `"description": ".+?"`
-	VIDEO_IMAGE       = `"https://i\.ytimg\.com/vi/[[:alnum:]]{11}/[[:alnum:]]+?.jpg\?[[:alpha:]]+?=.+?"`
+	VIDEO_IMAGE       = `"https://i\.ytimg\.com/vi/[[:ascii:]]{11}/[[:alnum:]]+?.jpg\?[[:alpha:]]+?=.+?"`
 )
 
 var vc map[string]*discordgo.VoiceConnection
@@ -61,6 +62,9 @@ func LeaveVoice(s *discordgo.Session, guildID string) error {
 
 // Stream a url to the given voice channel
 func StreamUrl(url, guildID string) error {
+	if vc[guildID] == nil {
+		return fmt.Errorf("tried to play into nil voice channel")
+	}
 	re := regexp.MustCompile(VIDEO_ID)
 	id := re.FindString(url)[2:]
 	ytdl := exec.Command("youtube-dl", "-f", "251", "-o", "-", id)
@@ -134,10 +138,16 @@ func UrlToEmbed(url string) (*discordgo.MessageEmbed, error) {
 	}
 	outString := string(output)
 	re = regexp.MustCompile(VIDEO_TITLE)
-	title := strings.Trim(re.FindString(outString)[10:], `"`)
+	title, err := strconv.Unquote(re.FindString(outString)[9:])
+	if err != nil {
+		title = fmt.Sprintf("%v", err)
+	}
 	link := `https://www.youtube.com/watch?v=` + id
 	re = regexp.MustCompile(VIDEO_DESCRIPTION)
-	desc := strings.Trim(re.FindString(outString)[15:], `"`)
+	desc, err := strconv.Unquote(re.FindString(outString)[15:])
+	if err != nil {
+		desc = fmt.Sprintf("%v", err)
+	}
 	lines := strings.Split(desc, `\n`)
 	if len(lines) > 15 {
 		lines = lines[:15]
