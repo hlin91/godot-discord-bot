@@ -44,11 +44,31 @@ var (
 		},
 		{
 			Name:        "join",
-			Description: "Sync up and discuss the latest code changes",
+			Description: "Just chatting",
 		},
 		{
 			Name:        "leave",
 			Description: "Just got paged",
+		},
+		{
+			Name:        "stream",
+			Description: "Stream a youtube url to the voice channel",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "url",
+					Description: "youtube url",
+					Required:    true,
+				},
+			},
+		},
+		{
+			Name:        "cease",
+			Description: "Cease playback of the current song",
+		},
+		{
+			Name:        "recess",
+			Description: "Toggle a brief recess in playback",
 		},
 	}
 	commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
@@ -124,7 +144,7 @@ var (
 				return
 			}
 			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-				Content: "我来了。",
+				Content: "Joined channel",
 			})
 		},
 		"leave": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -150,6 +170,78 @@ var (
 			}
 			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
 				Content: "Getting paged",
+			})
+		},
+		"stream": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "",
+				},
+			})
+			if err != nil {
+				s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
+					Content: "Something went wrong",
+				})
+				return
+			}
+			// TODO: Get video information
+			go func(url, gID string) {
+				err := voice.StreamUrl(url, gID)
+				if err != nil {
+					log.Panicf("error while streaming url %v: %v", url, err)
+				}
+			}(i.ApplicationCommandData().Options[0].StringValue(), i.GuildID)
+			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+				Content: "TODO: Put cool now playing message here",
+			})
+		},
+		"cease": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "",
+				},
+			})
+			if err != nil {
+				s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
+					Content: "Something went wrong",
+				})
+				return
+			}
+			err = voice.Skip(i.GuildID)
+			if err != nil {
+				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+					Content: "Could not skip",
+				})
+				return
+			}
+			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+				Content: "Successfully skipped",
+			})
+		},
+		"recess": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "",
+				},
+			})
+			if err != nil {
+				s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
+					Content: "Something went wrong",
+				})
+				return
+			}
+			err = voice.Pause(i.GuildID)
+			if err != nil {
+				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+					Content: "Could not pause",
+				})
+				return
+			}
+			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+				Content: "Successfully paused",
 			})
 		},
 	}
