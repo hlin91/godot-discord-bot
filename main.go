@@ -185,16 +185,22 @@ var (
 				})
 				return
 			}
-			// TODO: Get video information
+			info, err := voice.UrlToEmbed(i.ApplicationCommandData().Options[0].StringValue())
+			if err != nil {
+				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+					Content: "Failed to retrieve video info",
+				})
+			} else {
+				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+					Embeds: []*discordgo.MessageEmbed{info},
+				})
+			}
 			go func(url, gID string) {
 				err := voice.StreamUrl(url, gID)
 				if err != nil {
 					log.Panicf("error while streaming url %v: %v", url, err)
 				}
 			}(i.ApplicationCommandData().Options[0].StringValue(), i.GuildID)
-			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-				Content: "TODO: Put cool now playing message here",
-			})
 		},
 		"cease": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{

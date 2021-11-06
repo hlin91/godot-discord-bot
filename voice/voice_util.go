@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os/exec"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
@@ -11,7 +12,10 @@ import (
 )
 
 const (
-	VIDEO_ID = `v=[[:ascii:]]{11}`
+	VIDEO_ID          = `v=[[:ascii:]]{11}`
+	VIDEO_TITLE       = `"title": ".+?"`
+	VIDEO_DESCRIPTION = `"description": ".+?"`
+	VIDEO_IMAGE       = `"https://i\.ytimg\.com/vi/[[:alnum:]]{11}/[[:alnum:]]+?.jpg\?[[:alpha:]]+?=.+?"`
 )
 
 var vc map[string]*discordgo.VoiceConnection
@@ -118,4 +122,41 @@ func Skip(guildID string) error {
 	default:
 		return fmt.Errorf("skip signal already sent")
 	}
+}
+
+func UrlToEmbed(url string) (*discordgo.MessageEmbed, error) {
+	re := regexp.MustCompile(VIDEO_ID)
+	id := re.FindString(url)[2:]
+	ytdl := exec.Command("youtube-dl", "--skip-download", "--dump-json", id)
+	output, err := ytdl.Output()
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute command: %v", err)
+	}
+	outString := string(output)
+	re = regexp.MustCompile(VIDEO_TITLE)
+	title := strings.Trim(re.FindString(outString)[10:], `"`)
+	link := `https://www.youtube.com/watch?v=` + id
+	re = regexp.MustCompile(VIDEO_DESCRIPTION)
+	desc := strings.Trim(re.FindString(outString)[15:], `"`)
+	lines := strings.Split(desc, `\n`)
+	if len(lines) > 15 {
+		lines = lines[:15]
+	}
+	desc = strings.Join(lines, "\n")
+	re = regexp.MustCompile(VIDEO_IMAGE)
+	images := re.FindAllString(outString, -1)
+	img := strings.Trim(images[len(images)-1], `"`) // Get the highest res image
+	return &discordgo.MessageEmbed{
+		URL:         link,
+		Type:        discordgo.EmbedTypeArticle,
+		Title:       title,
+		Description: desc,
+		Author: &discordgo.MessageEmbedAuthor{
+			Name: "Now playing...",
+		},
+		Thumbnail: &discordgo.MessageEmbedThumbnail{
+			URL: img,
+		},
+		Color: 0xC4302B,
+	}, nil
 }
