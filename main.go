@@ -20,8 +20,11 @@ const (
 
 // Parameters
 var (
-	RemoveCommands = flag.Bool("rmcmd", false, "Remove all commands after shutdowning or not")
+	RegisterCommands = flag.Bool("rgcmd", false, "Registers slash commands on start")
+	RemoveCommands   = flag.Bool("rmcmd", false, "Remove all commands after shutdowning or not")
 )
+
+var StatusLock = make(chan interface{}, 1)
 
 func init() {
 	flag.Parse()
@@ -197,8 +200,13 @@ var (
 				})
 			}
 			go func(s *discordgo.Session, i *discordgo.InteractionCreate, url, gID string, info *discordgo.MessageEmbed) {
+				var signal interface{}
+				StatusLock <- signal
 				s.UpdateListeningStatus(info.Title)
-				defer s.UpdateListeningStatus("")
+				defer func(s *discordgo.Session) {
+					s.UpdateListeningStatus("")
+					<-StatusLock
+				}(s)
 				err := voice.StreamUrl(url, gID)
 				if err != nil {
 					info.Author = &discordgo.MessageEmbedAuthor{
@@ -297,14 +305,15 @@ func main() {
 	if err != nil {
 		log.Panicf("could not retrieve user guilds: %v", err)
 	}
-	for _, v := range commands {
-		for _, g := range ug {
-			_, err := session.ApplicationCommandCreate(session.State.User.ID, g.ID, v)
-			if err != nil {
-				log.Panicf("could not create '%v' command: %v", v.Name, err)
+	if *RegisterCommands {
+		for _, v := range commands {
+			for _, g := range ug {
+				_, err := session.ApplicationCommandCreate(session.State.User.ID, g.ID, v)
+				if err != nil {
+					log.Printf("could not create '%v' command: %v", v.Name, err)
+				}
 			}
 		}
-
 	}
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt)
@@ -316,7 +325,7 @@ func main() {
 			for _, v := range cmds {
 				err := session.ApplicationCommandDelete(session.State.User.ID, g.ID, v.ID)
 				if err != nil {
-					log.Panicf("could not delete '%v' command (id %v): %v", v.Name, v.ID, err)
+					log.Printf("could not delete '%v' command (id %v): %v", v.Name, v.ID, err)
 				}
 			}
 		}

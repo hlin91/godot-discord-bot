@@ -81,15 +81,15 @@ func StreamUrl(url, guildID string) error {
 	lock[guildID] <- token // Lock the mutex
 	skip[guildID] = make(chan interface{}, 1)
 	pause[guildID] = make(chan interface{}, 1)
+	defer func(ch chan interface{}) {
+		<-ch
+	}(lock[guildID])
 	defer func(gID string) {
 		skip[gID] = nil
 	}(guildID)
 	defer func(gID string) {
 		pause[gID] = nil
 	}(guildID)
-	defer func(ch chan interface{}) {
-		<-ch
-	}(lock[guildID])
 	vc[guildID].Speaking(true)
 	defer vc[guildID].Speaking(false)
 	err = ytdl.Start()

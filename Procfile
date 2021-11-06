@@ -1,1 +1,1 @@
-worker: go build && ./godot
+worker: go build && ./godot -rgcmd -rmcmd
