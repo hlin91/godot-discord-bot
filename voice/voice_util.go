@@ -154,9 +154,9 @@ func UrlToEmbed(url string) (*discordgo.MessageEmbed, error) {
 	if err != nil {
 		desc = fmt.Sprintf("%v", err)
 	}
-	lines := strings.Split(desc, `\n`)
-	if len(lines) > 15 {
-		lines = lines[:15]
+	lines := strings.Split(desc, "\n")
+	if len(lines) > 20 {
+		lines = lines[:20]
 	}
 	desc = strings.Join(lines, "\n")
 	re = regexp.MustCompile(VIDEO_IMAGE)
