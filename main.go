@@ -20,7 +20,7 @@ const (
 
 // Parameters
 var (
-	RemoveCommands = flag.Bool("rmcmd", true, "Remove all commands after shutdowning or not")
+	RemoveCommands = flag.Bool("rmcmd", false, "Remove all commands after shutdowning or not")
 )
 
 func init() {
@@ -161,7 +161,7 @@ var (
 				})
 				return
 			}
-			err = voice.LeaveVoice(s, i.GuildID)
+			err = voice.LeaveVoice(i.GuildID)
 			if err != nil {
 				log.Println(err)
 				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
@@ -197,6 +197,8 @@ var (
 				})
 			}
 			go func(s *discordgo.Session, i *discordgo.InteractionCreate, url, gID string, info *discordgo.MessageEmbed) {
+				s.UpdateListeningStatus(info.Title)
+				defer s.UpdateListeningStatus("")
 				err := voice.StreamUrl(url, gID)
 				if err != nil {
 					info.Author = &discordgo.MessageEmbedAuthor{
@@ -231,7 +233,7 @@ var (
 			err = voice.Skip(i.GuildID)
 			if err != nil {
 				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-					Content: "Could not skip",
+					Content: "An error occurred while attempting to skip",
 				})
 				return
 			}
@@ -255,12 +257,12 @@ var (
 			err = voice.Pause(i.GuildID)
 			if err != nil {
 				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-					Content: "Could not pause",
+					Content: "An error occured while attempting to pause",
 				})
 				return
 			}
 			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-				Content: "Successfully paused",
+				Content: "Successfully toggled pause",
 			})
 		},
 	}

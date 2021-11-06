@@ -40,13 +40,11 @@ func JoinVoice(s *discordgo.Session, guildID, channelID string) error {
 	}
 	vc[guildID] = voice
 	lock[guildID] = make(chan interface{}, 1)
-	skip[guildID] = make(chan interface{}, 1)
-	pause[guildID] = make(chan interface{}, 1)
 	return nil
 }
 
 // Disconnect from the voice channel of a guild
-func LeaveVoice(s *discordgo.Session, guildID string) error {
+func LeaveVoice(guildID string) error {
 	if vc == nil {
 		return fmt.Errorf("tried to disconnect from nil voice channel")
 	}
@@ -72,15 +70,6 @@ func StreamUrl(url, guildID string) error {
 	if err != nil {
 		return fmt.Errorf("failed to retrieve stdout pipe: %v", err)
 	}
-	err = ytdl.Start()
-	if err != nil {
-		return fmt.Errorf("failed to start ytdl process: %v", err)
-	}
-	var token interface{}
-	lock[guildID] <- token // Lock the mutex
-	defer func(ch chan interface{}) {
-		<-ch
-	}(lock[guildID])
 	options := dca.StdEncodeOptions
 	options.BufferedFrames = 1000 // Increase the frame buffer to reduce stuttering
 	encoder, err := dca.EncodeMem(outPipe, options)
@@ -88,8 +77,25 @@ func StreamUrl(url, guildID string) error {
 		return fmt.Errorf("failed to create dca encoder: %v", err)
 	}
 	tick := time.NewTicker(20 * time.Millisecond)
+	var token interface{}
+	lock[guildID] <- token // Lock the mutex
+	skip[guildID] = make(chan interface{}, 1)
+	pause[guildID] = make(chan interface{}, 1)
+	defer func(gID string) {
+		skip[gID] = nil
+	}(guildID)
+	defer func(gID string) {
+		pause[gID] = nil
+	}(guildID)
+	defer func(ch chan interface{}) {
+		<-ch
+	}(lock[guildID])
 	vc[guildID].Speaking(true)
 	defer vc[guildID].Speaking(false)
+	err = ytdl.Start()
+	if err != nil {
+		return fmt.Errorf("failed to start ytdl process: %v", err)
+	}
 	for frame, err := encoder.OpusFrame(); err == nil; frame, err = encoder.OpusFrame() {
 		select {
 		case <-skip[guildID]:
