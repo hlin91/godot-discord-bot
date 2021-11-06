@@ -196,14 +196,24 @@ var (
 					Embeds: []*discordgo.MessageEmbed{info},
 				})
 			}
-			go func(s *discordgo.Session, i *discordgo.InteractionCreate, url, gID string) {
+			go func(s *discordgo.Session, i *discordgo.InteractionCreate, url, gID string, info *discordgo.MessageEmbed) {
 				err := voice.StreamUrl(url, gID)
 				if err != nil {
+					info.Author = &discordgo.MessageEmbedAuthor{
+						Name: fmt.Sprintf("Error occured during playback: \n%v", err),
+					}
 					s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-						Content: fmt.Sprintf("Error occured during playback: %v", err),
+						Embeds: []*discordgo.MessageEmbed{info},
 					})
+					return
 				}
-			}(s, i, i.ApplicationCommandData().Options[0].StringValue(), i.GuildID)
+				info.Author = &discordgo.MessageEmbedAuthor{
+					Name: "Finished playing",
+				}
+				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+					Embeds: []*discordgo.MessageEmbed{info},
+				})
+			}(s, i, i.ApplicationCommandData().Options[0].StringValue(), i.GuildID, info)
 		},
 		"cease": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
