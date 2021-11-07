@@ -165,6 +165,7 @@ var (
 				return
 			}
 			err = voice.LeaveVoice(i.GuildID)
+			s.UpdateListeningStatus("")
 			if err != nil {
 				log.Println(err)
 				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
