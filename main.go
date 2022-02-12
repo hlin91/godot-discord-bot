@@ -285,12 +285,14 @@ func main() {
 	if err != nil {
 		log.Fatalf("could not create discord session: %v", err)
 	}
+	// Starts the rss listener
 	session.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
 		log.Println("starting rss listener...")
 		tick := time.NewTicker(WAIT_TIME)
 		go rss.ListenerProcess(s, getChannelID(), tick, done, ret)
 		log.Println("bot is running...")
 	})
+	// Calls the corresponding handler for a command
 	session.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
 			h(s, i)

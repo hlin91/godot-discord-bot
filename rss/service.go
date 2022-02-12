@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/bwmarrin/discordgo"
+	"github.com/harvlin/godot/module"
 	"github.com/mmcdole/gofeed"
 	"golang.org/x/net/html"
 )
@@ -24,10 +26,55 @@ var feeds []Feed                 // List of feeds to parse
 var seen map[Feed][]*gofeed.Item // Remember the items we have already seen
 var parser *gofeed.Parser
 
+var commands []*discordgo.ApplicationCommand
+var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){}
+
 func init() {
 	feeds = []Feed{}
 	seen = map[Feed][]*gofeed.Item{}
 	parser = gofeed.NewParser()
+	commands = []*discordgo.ApplicationCommand{
+		{
+			Name:        "test_rss",
+			Description: "Test the RSS feed feature by posting an RSS post to the channel",
+		},
+	}
+	commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
+		"test_rss": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "",
+				},
+			})
+			if err != nil {
+				s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
+					Content: "Something went wrong",
+				})
+				return
+			}
+			// Do RSS stuff here
+			ClearHistory()
+			items := GetLatest()
+			var item *gofeed.Item
+			images := []string{}
+			for key, val := range items {
+				item = val[0]
+				images, _ = GetImages(item.Link, key.Class, key.NumImages)
+				break
+			}
+			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+				Embeds: []*discordgo.MessageEmbed{
+					ItemToEmbed(item, images, ""),
+				},
+			})
+		},
+	}
+}
+
+// GetModule returns the command Module for RSS features
+func GetModule() module.Module {
+	return module.CreateModule(commands, commandHandlers)
 }
 
 // ClearHistory clears the recently seen lists
