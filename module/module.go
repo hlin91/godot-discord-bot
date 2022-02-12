@@ -6,11 +6,13 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+// Module groups together commands and handlers for registration with the discord session
 type Module struct {
 	commands []*discordgo.ApplicationCommand
 	handlers map[string]func(*discordgo.Session, *discordgo.InteractionCreate)
 }
 
+// Load registers the commands and handlers with the discord session
 func (m *Module) Load(session *discordgo.Session, commandHandlers map[string]func(*discordgo.Session, *discordgo.InteractionCreate), register bool) {
 	loadHandlers(commandHandlers, m.handlers)
 	if register {
@@ -18,6 +20,7 @@ func (m *Module) Load(session *discordgo.Session, commandHandlers map[string]fun
 	}
 }
 
+// CreateModule constructs a Module with a given set of commands and handlers
 func CreateModule(commands []*discordgo.ApplicationCommand, handlers map[string]func(*discordgo.Session, *discordgo.InteractionCreate)) Module {
 	return Module{
 		commands: commands,
@@ -25,6 +28,7 @@ func CreateModule(commands []*discordgo.ApplicationCommand, handlers map[string]
 	}
 }
 
+// loadHandlers loads the command handlers into the discord session
 func loadHandlers(commandHandlers map[string]func(*discordgo.Session, *discordgo.InteractionCreate), handlersToAdd map[string]func(*discordgo.Session, *discordgo.InteractionCreate)) {
 	for key, val := range handlersToAdd {
 		if _, ok := commandHandlers[key]; ok {
@@ -34,6 +38,7 @@ func loadHandlers(commandHandlers map[string]func(*discordgo.Session, *discordgo
 	}
 }
 
+// registerCommands registers the commands with the discord session
 func registerCommands(session *discordgo.Session, commands []*discordgo.ApplicationCommand) {
 	ug, err := session.UserGuilds(100, "", "")
 	if err != nil {
