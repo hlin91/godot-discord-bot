@@ -2,16 +2,15 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/harvlin/godot/module"
 	"github.com/harvlin/godot/rss"
 	"github.com/harvlin/godot/voice"
-	"github.com/mmcdole/gofeed"
 )
 
 const (
@@ -20,262 +19,23 @@ const (
 
 // Parameters
 var (
-	RegisterCommands = flag.Bool("rgcmd", false, "Registers slash commands on start")
-	RemoveCommands   = flag.Bool("rmcmd", false, "Remove all commands after shutdowning or not")
+	registerCommands = flag.Bool("rgcmd", false, "Registers slash commands on start")
+	removeCommands   = flag.Bool("rmcmd", false, "Remove all commands after shutdowning or not")
 )
 
-var StatusLock = make(chan interface{}, 1)
+var modules = []module.Module{}
+var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){}
 
 func init() {
 	flag.Parse()
+	modules = append(modules, rss.GetModule())
+	modules = append(modules, voice.GetModule())
 }
 
 func init() {
 	rss.AddFeed(`http://fiu758.blog111.fc2.com/?xml`, "main_txt", "sh_fc2blogheadbar_body", 2)
 	rss.AddFeed(`http://2chav.com/?xml`, "kobetu_kiji", "", 2)
 }
-
-// Declare our slash commands and their handlers
-var (
-	commands = []*discordgo.ApplicationCommand{
-		{
-			Name:        "pinger",
-			Description: "Replies with ponger",
-		},
-		{
-			Name:        "test_rss",
-			Description: "Test the RSS feed feature by posting an RSS post to the channel",
-		},
-		{
-			Name:        "join",
-			Description: "Just chatting",
-		},
-		{
-			Name:        "leave",
-			Description: "Just got paged",
-		},
-		{
-			Name:        "stream",
-			Description: "Stream a youtube url to the voice channel",
-			Options: []*discordgo.ApplicationCommandOption{
-				{
-					Type:        discordgo.ApplicationCommandOptionString,
-					Name:        "url",
-					Description: "youtube url",
-					Required:    true,
-				},
-			},
-		},
-		{
-			Name:        "cease",
-			Description: "Cease playback of the current song",
-		},
-		{
-			Name:        "recess",
-			Description: "Toggle a brief recess in playback",
-		},
-	}
-	commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
-		"pinger": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{Content: "ponger"},
-			})
-		},
-		"test_rss": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Content: "",
-				},
-			})
-			if err != nil {
-				s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
-					Content: "Something went wrong",
-				})
-				return
-			}
-			// Do RSS stuff here
-			rss.ClearHistory()
-			items := rss.GetLatest()
-			var item *gofeed.Item
-			images := []string{}
-			for key, val := range items {
-				item = val[0]
-				images, _ = rss.GetImages(item.Link, key.Class, key.NumImages)
-				break
-			}
-			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-				Embeds: []*discordgo.MessageEmbed{
-					rss.ItemToEmbed(item, images, ""),
-				},
-			})
-		},
-		"join": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Content: "Joining voice channel...",
-					// Flags:   1 << 6, // Ephemeral reply
-				},
-			})
-			if err != nil {
-				s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
-					Content: "Something went wrong",
-				})
-				return
-			}
-			if i.Member == nil {
-				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-					Content: "This command is only valid in guilds",
-				})
-				return
-			}
-			vs, err := s.State.VoiceState(i.GuildID, i.Member.User.ID)
-			if err != nil {
-				log.Println(err)
-				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-					Content: "Could not grab voice state for user",
-				})
-				return
-			}
-			err = voice.JoinVoice(s, i.GuildID, vs.ChannelID)
-			if err != nil {
-				log.Println(err)
-				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-					Content: "Could not join voice channel",
-				})
-				return
-			}
-			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-				Content: "Joined channel",
-			})
-		},
-		"leave": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Content: "",
-				},
-			})
-			if err != nil {
-				s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
-					Content: "Something went wrong",
-				})
-				return
-			}
-			err = voice.LeaveVoice(i.GuildID)
-			s.UpdateListeningStatus("")
-			if err != nil {
-				log.Println(err)
-				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-					Content: "Failed to leave voice channel",
-				})
-				return
-			}
-			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-				Content: "Getting paged",
-			})
-		},
-		"stream": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Content: "",
-				},
-			})
-			if err != nil {
-				s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
-					Content: "Something went wrong",
-				})
-				return
-			}
-			info, err := voice.UrlToEmbed(i.ApplicationCommandData().Options[0].StringValue())
-			if err != nil {
-				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-					Content: "Failed to retrieve video info",
-				})
-			} else {
-				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-					Embeds: []*discordgo.MessageEmbed{info},
-				})
-			}
-			go func(s *discordgo.Session, i *discordgo.InteractionCreate, url, gID string, info *discordgo.MessageEmbed) {
-				var signal interface{}
-				StatusLock <- signal
-				s.UpdateListeningStatus(info.Title)
-				defer func(s *discordgo.Session) {
-					s.UpdateListeningStatus("")
-					<-StatusLock
-				}(s)
-				err := voice.StreamUrl(url, gID)
-				if err != nil {
-					info.Author = &discordgo.MessageEmbedAuthor{
-						Name: fmt.Sprintf("Error occured during playback: \n%v", err),
-					}
-					s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-						Embeds: []*discordgo.MessageEmbed{info},
-					})
-					return
-				}
-				info.Author = &discordgo.MessageEmbedAuthor{
-					Name: "Finished playing",
-				}
-				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-					Embeds: []*discordgo.MessageEmbed{info},
-				})
-			}(s, i, i.ApplicationCommandData().Options[0].StringValue(), i.GuildID, info)
-		},
-		"cease": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Content: "",
-				},
-			})
-			if err != nil {
-				s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
-					Content: "Something went wrong",
-				})
-				return
-			}
-			err = voice.Skip(i.GuildID)
-			if err != nil {
-				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-					Content: "An error occurred while attempting to skip",
-				})
-				return
-			}
-			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-				Content: "Successfully skipped",
-			})
-		},
-		"recess": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Content: "",
-				},
-			})
-			if err != nil {
-				s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
-					Content: "Something went wrong",
-				})
-				return
-			}
-			err = voice.Pause(i.GuildID)
-			if err != nil {
-				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-					Content: "An error occured while attempting to pause",
-				})
-				return
-			}
-			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-				Content: "Successfully toggled pause",
-			})
-		},
-	}
-)
 
 func main() {
 	var session *discordgo.Session
@@ -285,6 +45,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("could not create discord session: %v", err)
 	}
+
 	// Starts the rss listener
 	session.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
 		log.Println("starting rss listener...")
@@ -298,31 +59,28 @@ func main() {
 			h(s, i)
 		}
 	})
+
 	session.Identify.Intents = discordgo.IntentsAll
 	err = session.Open()
 	if err != nil {
 		log.Fatalf("could not open bot session: %v", err)
 	}
 	defer session.Close()
-	ug, err := session.UserGuilds(100, "", "")
-	if err != nil {
-		log.Panicf("could not retrieve user guilds: %v", err)
+
+	// Load command modules
+	for _, m := range modules {
+		m.Load(session, commandHandlers, *registerCommands)
 	}
-	if *RegisterCommands {
-		for _, v := range commands {
-			for _, g := range ug {
-				_, err := session.ApplicationCommandCreate(session.State.User.ID, g.ID, v)
-				if err != nil {
-					log.Printf("could not create '%v' command: %v", v.Name, err)
-				}
-			}
-		}
-	}
+
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt)
 	<-stop
 	log.Println("shutting down...")
-	if *RemoveCommands {
+	if *removeCommands {
+		ug, err := session.UserGuilds(100, "", "")
+		if err != nil {
+			log.Panicf("could not retrieve user guilds: %v", err)
+		}
 		for _, g := range ug {
 			cmds, _ := session.ApplicationCommands(session.State.User.ID, g.ID)
 			for _, v := range cmds {
