@@ -45,6 +45,10 @@ func main() {
 	if err != nil {
 		log.Fatalf("could not create discord session: %v", err)
 	}
+	ug, err := session.UserGuilds(100, "", "")
+	if err != nil {
+		log.Panicf("could not retrieve user guilds: %v", err)
+	}
 
 	// Starts the rss listener
 	session.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
@@ -57,6 +61,15 @@ func main() {
 	session.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
 			h(s, i)
+		} else {
+			// Unregister the problematic command
+			v := i.ApplicationCommandData()
+			for _, g := range ug {
+				err := session.ApplicationCommandDelete(session.State.User.ID, g.ID, v.ID)
+				if err != nil {
+					log.Printf("could not delete '%v' command (id %v): %v", v.Name, v.ID, err)
+				}
+			}
 		}
 	})
 
@@ -77,10 +90,6 @@ func main() {
 	<-stop
 	log.Println("shutting down...")
 	if *removeCommands {
-		ug, err := session.UserGuilds(100, "", "")
-		if err != nil {
-			log.Panicf("could not retrieve user guilds: %v", err)
-		}
 		for _, g := range ug {
 			cmds, _ := session.ApplicationCommands(session.State.User.ID, g.ID)
 			for _, v := range cmds {
