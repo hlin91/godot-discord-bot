@@ -16,13 +16,21 @@ func ItemToEmbed(item *gofeed.Item, images []string, logos []string) *discordgo.
 	if len(images) == 0 {
 		images = append(images, "")
 	}
+	author := ""
+	datePublished := ""
+	if item.Author != nil {
+		author = item.Author.Name
+	}
+	if item.PublishedParsed != nil {
+		datePublished = item.PublishedParsed.Format(time.ANSIC)
+	}
 	return &discordgo.MessageEmbed{
 		URL:         item.Link,
 		Type:        discordgo.EmbedTypeArticle,
 		Title:       "<a:newspaper:793257230618460160> **| Hot off the press**\n\n" + item.Title,
-		Description: item.PublishedParsed.Format(time.ANSIC) + "\n\n" + item.Description,
+		Description: datePublished + "\n\n" + item.Description,
 		Author: &discordgo.MessageEmbedAuthor{
-			Name: item.Author.Name,
+			Name: author,
 		},
 		Thumbnail: &discordgo.MessageEmbedThumbnail{
 			URL: logos[0],
