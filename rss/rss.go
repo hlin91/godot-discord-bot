@@ -58,14 +58,16 @@ func init() {
 			items := GetLatest()
 			var item *gofeed.Item
 			images := []string{}
+			logos := []string{}
 			for key, val := range items {
 				item = val[0]
 				images, _ = GetImages(item.Link, key.Class, key.NumImages)
+				logos, _ = GetImages(item.Link, key.LogoClass, key.NumImages)
 				break
 			}
 			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
 				Embeds: []*discordgo.MessageEmbed{
-					ItemToEmbed(item, images, ""),
+					ItemToEmbed(item, images, logos),
 				},
 			})
 		},
@@ -125,6 +127,9 @@ func GetLatest() map[Feed][]*gofeed.Item {
 
 // GetImages returns the first n images from the given url page. If a root class is provided, all
 // nodes with that class will be searched for images
+// url: The url for the page to parse for images
+// class: The root class to parse for images in
+// n: The maximum number of images to search for
 func GetImages(url, class string, n int) ([]string, error) {
 	result := []string{}
 	// Load the page and parse the html
@@ -140,11 +145,13 @@ func GetImages(url, class string, n int) ([]string, error) {
 	if err != nil {
 		return []string{}, fmt.Errorf("parsing %s as HTML: %v", url, err)
 	}
+	// No class is given so search all anchor and image tags
 	if class == "" {
 		result = getImagesHelp(doc, "a", result, n)
 		result = getImagesHelp(doc, "img", result, n)
 		return result, nil
 	}
+	// Search all anchor and image tags nested within the given node class
 	nodes := []*html.Node{}
 	nodes = getNodesByClass(doc, class, nodes)
 	for _, node := range nodes {

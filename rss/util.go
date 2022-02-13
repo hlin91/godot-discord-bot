@@ -7,6 +7,15 @@ import (
 	"golang.org/x/net/html"
 )
 
+// Element attributes that are known to contain image links
+var isImageAttr map[string]bool = map[string]bool{
+	"href":     true,
+	"src":      true,
+	"url":      true,
+	"srcset":   true,
+	"data-src": true,
+}
+
 func getImageFormats() []string {
 	return []string{".jpg", ".png", ".jpeg"}
 }
@@ -40,13 +49,18 @@ func getImagesHelp(node *html.Node, dataType string, linksFound []string, n int)
 	}
 	if node.Type == html.ElementNode && node.Data == dataType {
 		for _, a := range node.Attr {
-			if (a.Key == "href" || a.Key == "src") && isImageFormat(a.Val) && len(linksFound) < n {
+			if isImageAttr[a.Key] && isImageFormat(a.Val) && len(linksFound) < n {
 				linksFound = append(linksFound, a.Val)
 			}
 		}
 	}
 	for c := node.FirstChild; c != nil; c = c.NextSibling {
 		linksFound = getImagesHelp(c, dataType, linksFound, n)
+	}
+	// Some links found will begin with "//" without specifying the protocol
+	// This causes issues so we will trim it from the string
+	for i, s := range linksFound {
+		linksFound[i] = strings.TrimLeft(s, "/")
 	}
 	return linksFound
 }
