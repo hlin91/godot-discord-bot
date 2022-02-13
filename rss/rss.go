@@ -12,7 +12,8 @@ import (
 )
 
 const (
-	MAX_ITEMS = 50
+	MAX_ITEMS  = 50
+	USER_AGENT = `Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:97.0) Gecko/20100101 Firefox/97.0`
 )
 
 type Feed struct {
@@ -59,16 +60,15 @@ func init() {
 			var item *gofeed.Item
 			images := []string{}
 			logos := []string{}
+			embeds := []*discordgo.MessageEmbed{}
 			for key, val := range items {
 				item = val[0]
 				images, _ = GetImages(item.Link, key.Class, key.NumImages)
 				logos, _ = GetImages(item.Link, key.LogoClass, key.NumImages)
-				break
+				embeds = append(embeds, ItemToEmbed(item, images, logos))
 			}
 			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-				Embeds: []*discordgo.MessageEmbed{
-					ItemToEmbed(item, images, logos),
-				},
+				Embeds: embeds,
 			})
 		},
 	}
@@ -132,8 +132,14 @@ func GetLatest() map[Feed][]*gofeed.Item {
 // n: The maximum number of images to search for
 func GetImages(url, class string, n int) ([]string, error) {
 	result := []string{}
+	client := httpClientWithCookieJar()
 	// Load the page and parse the html
-	resp, err := http.Get(url)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return []string{}, fmt.Errorf("making request: %v", err)
+	}
+	req.Header.Set("User-Agent", USER_AGENT)
+	resp, err := client.Do(req)
 	if err != nil {
 		return []string{}, fmt.Errorf("getting %s: %v", url, err)
 	}

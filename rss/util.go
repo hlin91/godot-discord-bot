@@ -1,11 +1,30 @@
 package rss
 
 import (
+	"fmt"
+	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/mmcdole/gofeed"
 	"golang.org/x/net/html"
 )
+
+type myJar struct {
+	jar map[string][]*http.Cookie
+}
+
+func (p *myJar) SetCookies(u *url.URL, cookies []*http.Cookie) {
+	fmt.Printf("The URL is : %s\n", u.String())
+	fmt.Printf("The cookie being set is : %s\n", cookies)
+	p.jar[u.Host] = cookies
+}
+
+func (p *myJar) Cookies(u *url.URL) []*http.Cookie {
+	fmt.Printf("The URL is : %s\n", u.String())
+	fmt.Printf("Cookie being returned is : %s\n", p.jar[u.Host])
+	return p.jar[u.Host]
+}
 
 // Element attributes that are known to contain image links
 var isImageAttr map[string]bool = map[string]bool{
@@ -85,4 +104,13 @@ func getNodesByClass(node *html.Node, class string, result []*html.Node) []*html
 		result = getNodesByClass(c, class, result)
 	}
 	return result
+}
+
+func httpClientWithCookieJar() *http.Client {
+	// Set up the cookie jar so requests can be authenticated
+	jar := &myJar{}
+	jar.jar = map[string][]*http.Cookie{}
+	client := &http.Client{}
+	client.Jar = jar
+	return client
 }
