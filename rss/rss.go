@@ -57,19 +57,20 @@ func init() {
 			// Do RSS stuff here
 			ClearHistory()
 			items := GetLatest()
-			var item *gofeed.Item
 			images := []string{}
 			logos := []string{}
 			embeds := []*discordgo.MessageEmbed{}
 			for key, val := range items {
-				item = val[0]
-				images, _ = GetImages(item.Link, key.Class, key.NumImages)
-				logos, _ = GetImages(item.Link, key.LogoClass, key.NumImages)
-				embeds = append(embeds, ItemToEmbed(item, images, logos))
+				images, _ = GetImages(val[0].Link, key.Class, key.NumImages)
+				logos, _ = GetImages(val[0].Link, key.LogoClass, key.NumImages)
+				embeds = append(embeds, ItemToEmbed(val[0], images, logos))
 			}
-			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+			_, err = s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
 				Embeds: embeds,
 			})
+			if err != nil {
+				log.Printf("test_rss: %v", err)
+			}
 		},
 	}
 }
