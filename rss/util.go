@@ -26,6 +26,12 @@ func (p *myJar) Cookies(u *url.URL) []*http.Cookie {
 	return p.jar[u.Host]
 }
 
+func DefaultImageLinkTransformStrategy() func(string) string {
+	return func(s string) string {
+		return s
+	}
+}
+
 // Element attributes that are known to contain image links
 var isImageAttr map[string]bool = map[string]bool{
 	"href":     true,
@@ -75,11 +81,6 @@ func getImagesHelp(node *html.Node, dataType string, linksFound []string, n int)
 	}
 	for c := node.FirstChild; c != nil; c = c.NextSibling {
 		linksFound = getImagesHelp(c, dataType, linksFound, n)
-	}
-	// Some links found will begin with "//" without specifying the protocol
-	// This causes issues so we will trim it from the string
-	for i, s := range linksFound {
-		linksFound[i] = strings.TrimLeft(s, "/")
 	}
 	return linksFound
 }

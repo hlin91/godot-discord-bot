@@ -17,10 +17,11 @@ const (
 )
 
 type Feed struct {
-	Url       string
-	Class     string
-	LogoClass string
-	NumImages int
+	Url                        string
+	Class                      string
+	LogoClass                  string
+	NumImages                  int
+	ImageLinkTransformStrategy *func(string) string
 }
 
 var feeds []Feed                 // List of feeds to parse
@@ -61,8 +62,8 @@ func init() {
 			logos := []string{}
 			embeds := []*discordgo.MessageEmbed{}
 			for key, val := range items {
-				images, _ = GetImages(val[0].Link, key.Class, key.NumImages)
-				logos, _ = GetImages(val[0].Link, key.LogoClass, key.NumImages)
+				images, _ = GetImages(val[0].Link, key.Class, key.NumImages, *key.ImageLinkTransformStrategy)
+				logos, _ = GetImages(val[0].Link, key.LogoClass, key.NumImages, *key.ImageLinkTransformStrategy)
 				embeds = append(embeds, ItemToEmbed(val[0], images, logos))
 			}
 			_, err = s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
@@ -88,12 +89,13 @@ func ClearHistory() {
 }
 
 // AddFeed adds a url to the list of feeds to parse
-func AddFeed(url string, class string, logo string, n int) {
+func AddFeed(url string, class string, logo string, n int, imageLinkTransformStrategy func(string) string) {
 	feeds = append(feeds, Feed{
-		Url:       url,
-		Class:     class,
-		LogoClass: logo,
-		NumImages: n,
+		Url:                        url,
+		Class:                      class,
+		LogoClass:                  logo,
+		NumImages:                  n,
+		ImageLinkTransformStrategy: &imageLinkTransformStrategy,
 	})
 }
 
@@ -131,7 +133,7 @@ func GetLatest() map[Feed][]*gofeed.Item {
 // url: The url for the page to parse for images
 // class: The root class to parse for images in
 // n: The maximum number of images to search for
-func GetImages(url, class string, n int) ([]string, error) {
+func GetImages(url, class string, n int, transformStrategy func(string) string) ([]string, error) {
 	result := []string{}
 	client := httpClientWithCookieJar()
 	// Load the page and parse the html
@@ -156,6 +158,10 @@ func GetImages(url, class string, n int) ([]string, error) {
 	if class == "" {
 		result = getImagesHelp(doc, "a", result, n)
 		result = getImagesHelp(doc, "img", result, n)
+		// Transform the result
+		for key, val := range result {
+			result[key] = transformStrategy(val)
+		}
 		return result, nil
 	}
 	// Search all anchor and image tags nested within the given node class
@@ -166,6 +172,10 @@ func GetImages(url, class string, n int) ([]string, error) {
 	}
 	for _, node := range nodes {
 		result = getImagesHelp(node, "img", result, n)
+	}
+	// Transform the result
+	for key, val := range result {
+		result[key] = transformStrategy(val)
 	}
 	return result, nil
 }

@@ -56,8 +56,8 @@ func ListenerProcess(d *discordgo.Session, channelID string, t *time.Ticker, don
 			items := GetLatest()
 			for source, list := range items {
 				for _, i := range list {
-					images, _ := GetImages(i.Link, source.Class, source.NumImages)
-					logos, _ := GetImages(i.Link, source.LogoClass, 1)
+					images, _ := GetImages(i.Link, source.Class, source.NumImages, *source.ImageLinkTransformStrategy)
+					logos, _ := GetImages(i.Link, source.LogoClass, 1, *source.ImageLinkTransformStrategy)
 					d.ChannelMessageSendEmbed(channelID, ItemToEmbed(i, images, logos))
 				}
 			}
