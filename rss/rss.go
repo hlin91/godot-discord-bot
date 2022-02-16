@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/harvlin/godot/module"
@@ -17,11 +18,12 @@ const (
 )
 
 type Feed struct {
-	Url                        string
-	Class                      string
-	LogoClass                  string
-	NumImages                  int
-	ImageLinkTransformStrategy *func(string) string
+	Url                         string
+	NumImages                   int
+	ImageNodeFilterStrategy     *func(*html.Node) bool
+	LogoImageNodeFilterStrategy *func(*html.Node) bool
+	ImageLinkExtractionStrategy *func(*html.Node) string
+	ImageLinkTransformStrategy  *func(string) string
 }
 
 var feeds []Feed                 // List of feeds to parse
@@ -62,8 +64,8 @@ func init() {
 			logos := []string{}
 			embeds := []*discordgo.MessageEmbed{}
 			for key, val := range items {
-				images, _ = GetImages(val[0].Link, key.Class, key.NumImages, *key.ImageLinkTransformStrategy)
-				logos, _ = GetImages(val[0].Link, key.LogoClass, key.NumImages, *key.ImageLinkTransformStrategy)
+				images, _ = GetImages(val[0].Link, *key.ImageNodeFilterStrategy, key.NumImages, *key.ImageLinkExtractionStrategy, *key.ImageLinkTransformStrategy)
+				logos, _ = GetImages(val[0].Link, *key.LogoImageNodeFilterStrategy, key.NumImages, *key.ImageLinkExtractionStrategy, *key.ImageLinkTransformStrategy)
 				embeds = append(embeds, ItemToEmbed(val[0], images, logos))
 			}
 			_, err = s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
@@ -89,13 +91,14 @@ func ClearHistory() {
 }
 
 // AddFeed adds a url to the list of feeds to parse
-func AddFeed(url string, class string, logo string, n int, imageLinkTransformStrategy func(string) string) {
+func AddFeed(url string, imageNodeFilterStrategy func(*html.Node) bool, logoImageNodeFilterStrategy func(*html.Node) bool, imageLinkExtractionStrategy func(*html.Node) string, imageLinkTransformStrategy func(string) string, n int) {
 	feeds = append(feeds, Feed{
-		Url:                        url,
-		Class:                      class,
-		LogoClass:                  logo,
-		NumImages:                  n,
-		ImageLinkTransformStrategy: &imageLinkTransformStrategy,
+		Url:                         url,
+		ImageNodeFilterStrategy:     &imageNodeFilterStrategy,
+		LogoImageNodeFilterStrategy: &logoImageNodeFilterStrategy,
+		ImageLinkExtractionStrategy: &imageLinkExtractionStrategy,
+		ImageLinkTransformStrategy:  &imageLinkTransformStrategy,
+		NumImages:                   n,
 	})
 }
 
@@ -133,9 +136,11 @@ func GetLatest() map[Feed][]*gofeed.Item {
 // GetImages returns the first n images from the given url page. If a root class is provided, all
 // nodes with that class will be searched for images
 // url: The url for the page to parse for images
-// class: The root class to parse for images in
-// n: The maximum number of images to search for
-func GetImages(url, class string, n int, transformStrategy func(string) string) ([]string, error) {
+// filterStrategy: Function to narrow down the try to extract links from
+// maxLinks: The maximum number of images to search for
+// extractionStrategy: Function to extract the image link data as a string from a given node
+// transformStrategy: Function to transform the resulting image links before returning
+func GetImages(url string, filterStrategy func(*html.Node) bool, maxLinks int, extractionStrategy func(*html.Node) string, transformStrategy func(string) string) ([]string, error) {
 	result := []string{}
 	client := httpClientWithCookieJar()
 	// Load the page and parse the html
@@ -156,28 +161,102 @@ func GetImages(url, class string, n int, transformStrategy func(string) string) 
 	if err != nil {
 		return []string{}, fmt.Errorf("parsing %s as HTML: %v", url, err)
 	}
-	// No class is given so search all anchor and image tags
-	if class == "" {
-		result = getImagesHelp(doc, "a", result, n)
-		result = getImagesHelp(doc, "img", result, n)
-		// Transform the result
-		for key, val := range result {
-			result[key] = transformStrategy(val)
-		}
-		return result, nil
-	}
-	// Search all anchor and image tags nested within the given node class
+	// Extract images by using the provided filter, extraction, and transform strategy
 	nodes := []*html.Node{}
-	nodes = getNodesByClass(doc, class, nodes)
-	for _, node := range nodes {
-		result = getImagesHelp(node, "a", result, n)
-	}
-	for _, node := range nodes {
-		result = getImagesHelp(node, "img", result, n)
+	nodes = getNodesByFunc(doc, filterStrategy, nodes)
+	result = []string{}
+	for _, n := range nodes {
+		link := extractionStrategy(n)
+		if len(link) > 0 && len(result) < maxLinks {
+			result = append(result, extractionStrategy(n))
+		}
 	}
 	// Transform the result
 	for key, val := range result {
 		result[key] = transformStrategy(val)
 	}
 	return result, nil
+}
+
+// NoFilterStrategy returns a default node filter strategy that does not filter
+func NoFilterStrategy() func(*html.Node) bool {
+	return func(*html.Node) bool {
+		return true
+	}
+}
+
+// DefaultFilterStrategy returns a filter to only find nodes that are anchor or image tags
+func DefaultFilterStrategy() func(*html.Node) bool {
+	return func(n *html.Node) bool {
+		if n.Type == html.ElementNode && (n.Data == "a" || n.Data == "img") {
+			for _, a := range n.Attr {
+				if isImageAttribute(a.Key) && isImageFormat(a.Val) {
+					return true
+				}
+			}
+		}
+		return false
+	}
+}
+
+// ParentNodeFilterFunc constructs a filter based on a condition being met for 1 or more of a node's parents
+func ParentNodeFilterFunc(condition func(*html.Node) bool) func(*html.Node) bool {
+	return func(n *html.Node) bool {
+		p := n.Parent
+		for p != nil {
+			if condition(p) {
+				return true
+			}
+			p = p.Parent
+		}
+		return false
+	}
+}
+
+func DefaultTransformStrategy() func(string) string {
+	return func(s string) string {
+		return s
+	}
+}
+
+// DefaultExtractionStrategy returns an extractor for image links in known formats
+func DefaultExtractionStrategy() func(*html.Node) string {
+	return func(n *html.Node) string {
+		for _, a := range n.Attr {
+			if isImageAttribute(a.Key) && isImageFormat(a.Val) {
+				return a.Val
+			}
+		}
+		return ""
+	}
+}
+
+// FilterByClass constructs a filter strategy that filters by class
+func FilterByClass(class string) func(*html.Node) bool {
+	cl := class
+	return func(node *html.Node) bool {
+		for _, a := range node.Attr {
+			if a.Key == "class" {
+				classes := strings.Split(a.Val, ",")
+				for _, c := range classes {
+					if c == cl {
+						return true
+					}
+				}
+			}
+		}
+		return false
+	}
+}
+
+// FilterByAttr constructs a filter strategy that filters by the presence of a specific attribute
+func FilterByAttr(key, val string) func(*html.Node) bool {
+	return func(n *html.Node) bool {
+		for _, a := range n.Attr {
+			if a.Key == key && a.Val == val {
+				return true
+			}
+		}
+		return false
+	}
 }

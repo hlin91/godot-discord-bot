@@ -10,6 +10,16 @@ import (
 	"golang.org/x/net/html"
 )
 
+// Element attributes that are known to contain image links
+var isImageAttr map[string]bool = map[string]bool{
+	"href":     true,
+	"src":      true,
+	"url":      true,
+	"srcset":   true,
+	"data-src": true,
+	"content":  true,
+}
+
 type myJar struct {
 	jar map[string][]*http.Cookie
 }
@@ -26,21 +36,6 @@ func (p *myJar) Cookies(u *url.URL) []*http.Cookie {
 	return p.jar[u.Host]
 }
 
-func DefaultImageLinkTransformStrategy() func(string) string {
-	return func(s string) string {
-		return s
-	}
-}
-
-// Element attributes that are known to contain image links
-var isImageAttr map[string]bool = map[string]bool{
-	"href":     true,
-	"src":      true,
-	"url":      true,
-	"srcset":   true,
-	"data-src": true,
-}
-
 func getImageFormats() []string {
 	return []string{".jpg", ".png", ".jpeg"}
 }
@@ -53,6 +48,10 @@ func isImageFormat(s string) bool {
 		}
 	}
 	return false
+}
+
+func isImageAttribute(s string) bool {
+	return isImageAttr[s]
 }
 
 func itemInList(list []*gofeed.Item, item *gofeed.Item) bool {
@@ -85,28 +84,30 @@ func getImagesHelp(node *html.Node, dataType string, linksFound []string, n int)
 	return linksFound
 }
 
-// Get all the nodes that match a given class name
-func getNodesByClass(node *html.Node, class string, result []*html.Node) []*html.Node {
+// Get all nodes that comply with the given filter function
+func getNodesByFunc(node *html.Node, filter func(*html.Node) bool, result []*html.Node) []*html.Node {
 	if node == nil {
 		return result
 	}
-	for _, a := range node.Attr {
-		if a.Key == "class" {
-			classes := strings.Split(a.Val, ",")
-			for _, c := range classes {
-				if c == class {
-					result = append(result, node)
-					break
-				}
-			}
-		}
+	if filter(node) {
+		result = append(result, node)
 	}
 	for c := node.FirstChild; c != nil; c = c.NextSibling {
-		result = getNodesByClass(c, class, result)
+		result = getNodesByFunc(c, filter, result)
 	}
 	return result
 }
 
+// Run an extractor function to extract data from a list of nodes
+func extractFromNodes(nodes []*html.Node, extractor func(*html.Node) string) []string {
+	result := []string{}
+	for _, n := range nodes {
+		result = append(result, extractor(n))
+	}
+	return result
+}
+
+// Construct an http client with a working cookie jar
 func httpClientWithCookieJar() *http.Client {
 	// Set up the cookie jar so requests can be authenticated
 	jar := &myJar{}

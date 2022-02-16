@@ -12,6 +12,7 @@ import (
 	"github.com/harvlin/godot/module"
 	"github.com/harvlin/godot/rss"
 	"github.com/harvlin/godot/voice"
+	"golang.org/x/net/html"
 )
 
 const (
@@ -34,14 +35,30 @@ func init() {
 }
 
 func init() {
-	rss.AddFeed(`http://fiu758.blog111.fc2.com/?xml`, "main_txt", "sh_fc2blogheadbar_body", 1, rss.DefaultImageLinkTransformStrategy())
-	rss.AddFeed(`http://2chav.com/?xml`, "kobetu_kiji", "", 1, rss.DefaultImageLinkTransformStrategy())
-	rss.AddFeed(`https://dlsite-rss.s3-ap-northeast-1.amazonaws.com/voice_rss.xml`, "work_parts_multitype_item type_contents", "logo", 1, func(s string) string {
-		if strings.HasPrefix(s, "//") {
-			return `https:` + s
+	rss.AddFeed(`http://fiu758.blog111.fc2.com/?xml`, func(n *html.Node) bool {
+		parentFilter := rss.ParentNodeFilterFunc(rss.FilterByClass("main_txt"))
+		nodeFilter := rss.DefaultFilterStrategy()
+		return parentFilter(n) && nodeFilter(n)
+	}, func(n *html.Node) bool {
+		parentFilter := rss.ParentNodeFilterFunc(rss.FilterByClass("sh_fc2blogheadbar_body"))
+		nodeFilter := rss.DefaultFilterStrategy()
+		return parentFilter(n) && nodeFilter(n)
+	}, rss.DefaultExtractionStrategy(), rss.DefaultTransformStrategy(), 1)
+	rss.AddFeed(`http://2chav.com/?xml`, func(n *html.Node) bool {
+		parentFilter := rss.ParentNodeFilterFunc(rss.FilterByClass("kobetu_kiji"))
+		nodeFilter := rss.DefaultFilterStrategy()
+		return parentFilter(n) && nodeFilter(n)
+	}, rss.DefaultFilterStrategy(), rss.DefaultExtractionStrategy(), rss.DefaultTransformStrategy(), 1)
+	rss.AddFeed(`https://dlsite-rss.s3-ap-northeast-1.amazonaws.com/voice_rss.xml`, rss.FilterByAttr("property", "og:image"), func(n *html.Node) bool {
+		parentFilter := rss.ParentNodeFilterFunc(rss.FilterByClass("logo"))
+		nodeFilter := rss.DefaultFilterStrategy()
+		return parentFilter(n) && nodeFilter(n)
+	}, rss.DefaultExtractionStrategy(), func(s string) string {
+		if strings.HasPrefix(s, "/") {
+			return `https://www.dlsite.com` + s
 		}
-		return `https://www.dlsite.com` + s
-	})
+		return s
+	}, 1)
 }
 
 func main() {
