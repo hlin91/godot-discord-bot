@@ -108,7 +108,7 @@ func init() {
 				return
 			}
 			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-				Content: "Getting paged",
+				Content: ":alarm_clock:Getting paged!:alarm_clock:",
 			})
 		},
 		"stream": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -145,7 +145,7 @@ func init() {
 				err := StreamUrl(url, gID)
 				if err != nil {
 					info.Author = &discordgo.MessageEmbedAuthor{
-						Name: fmt.Sprintf("Error occured during playback: \n%v", err),
+						Name: fmt.Sprintf("Error occurred during playback: \n%v", err),
 					}
 					s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
 						Embeds: []*discordgo.MessageEmbed{info},
@@ -200,7 +200,7 @@ func init() {
 			err = Pause(i.GuildID)
 			if err != nil {
 				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-					Content: "An error occured while attempting to pause",
+					Content: "An error occurred while attempting to pause",
 				})
 				return
 			}

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/andybalholm/cascadia"
+	"github.com/bwmarrin/discordgo"
 	"golang.org/x/net/html"
 )
 
@@ -18,6 +19,7 @@ const (
 	LEETCODE_PROBLEM_ANCHORS    = `div[role="rowgroup"] div[role="cell"] a:not([aria-label="solution"])`
 	LEETCODE_PROBLEM_DIFFICULTY = `div[diff]`
 	USER_AGENT                  = `Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:97.0) Gecko/20100101 Firefox/97.0`
+	LEETCODE_ICON_URL           = `https://avatars0.githubusercontent.com/u/48126122?s=280&v=4`
 )
 
 type myJar struct {
@@ -130,4 +132,18 @@ func leetcodeGetRandomQuestion() (string, error) {
 	}
 	randomProblem := problems[rand.Intn(len(problems))]
 	return LEETCODE_PAGE_ROOT + randomProblem, nil
+}
+
+// Construct a discord message embed from a leetcode question link
+func leetcodeQuestionToEmbed(url string) *discordgo.MessageEmbed {
+	return &discordgo.MessageEmbed{
+		URL:         url,
+		Type:        discordgo.EmbedTypeArticle,
+		Title:       ":books:Homework Assignment:books:",
+		Description: "Due tomorrow!",
+		Thumbnail: &discordgo.MessageEmbedThumbnail{
+			URL: LEETCODE_ICON_URL,
+		},
+		Color: 0xFF9900,
+	}
 }

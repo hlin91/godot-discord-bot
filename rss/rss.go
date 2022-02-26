@@ -31,7 +31,7 @@ var seen map[Feed][]*gofeed.Item // Remember the items we have already seen
 var parser *gofeed.Parser
 
 var commands []*discordgo.ApplicationCommand
-var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){}
+var commandHandlers map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate)
 
 func init() {
 	feeds = []Feed{}
