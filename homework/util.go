@@ -2,6 +2,7 @@ package homework
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 	"net/http"
 	"net/url"
@@ -20,6 +21,10 @@ const (
 	LEETCODE_PROBLEM_DIFFICULTY = `div[diff]`
 	USER_AGENT                  = `Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:97.0) Gecko/20100101 Firefox/97.0`
 	LEETCODE_ICON_URL           = `https://avatars0.githubusercontent.com/u/48126122?s=280&v=4`
+	ROSETTA_PAGE_ROOT           = `https://rosettacode.org`
+	ROSETTA_PROBLEM_SET         = `https://rosettacode.org/wiki/Category:Programming_Tasks`
+	ROSETTA_PROBLEM_ANCHORS     = `div.mw-category-group ul li a`
+	POP_QUIZ_ICON_URL           = `https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books/blob/master/C++/cirno_teaches_c++.jpg?raw=true`
 )
 
 type myJar struct {
@@ -27,14 +32,14 @@ type myJar struct {
 }
 
 func (p *myJar) SetCookies(u *url.URL, cookies []*http.Cookie) {
-	fmt.Printf("The URL is : %s\n", u.String())
-	fmt.Printf("The cookie being set is : %s\n", cookies)
+	log.Printf("The URL is : %s\n", u.String())
+	log.Printf("The cookie being set is : %s\n", cookies)
 	p.jar[u.Host] = cookies
 }
 
 func (p *myJar) Cookies(u *url.URL) []*http.Cookie {
-	fmt.Printf("The URL is : %s\n", u.String())
-	fmt.Printf("Cookie being returned is : %s\n", p.jar[u.Host])
+	log.Printf("The URL is : %s\n", u.String())
+	log.Printf("Cookie being returned is : %s\n", p.jar[u.Host])
 	return p.jar[u.Host]
 }
 
@@ -139,11 +144,69 @@ func leetcodeQuestionToEmbed(url string) *discordgo.MessageEmbed {
 	return &discordgo.MessageEmbed{
 		URL:         url,
 		Type:        discordgo.EmbedTypeArticle,
-		Title:       ":books:Homework Assignment:books:",
+		Title:       ":books: Homework Assignment :books:",
 		Description: "Due tomorrow!",
 		Thumbnail: &discordgo.MessageEmbedThumbnail{
 			URL: LEETCODE_ICON_URL,
 		},
 		Color: 0xFF9900,
+	}
+}
+
+// Return the list of coding problems for rosetta
+func rosettaGetProblemList() ([]string, error) {
+	url := ROSETTA_PROBLEM_SET
+	client := httpClientWithCookieJar()
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return []string{}, fmt.Errorf("making request: %v", err)
+	}
+	req.Header.Set("User-Agent", USER_AGENT)
+	resp, err := client.Do(req)
+	if err != nil {
+		return []string{}, fmt.Errorf("getting %s: %v", url, err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return []string{}, fmt.Errorf("getting %s: %v", url, err)
+	}
+	doc, err := html.Parse(resp.Body)
+	if err != nil {
+		return []string{}, fmt.Errorf("parsing %s as HTML: %v", url, err)
+	}
+	anchors := cascadia.QueryAll(doc, cascadia.MustCompile(ROSETTA_PROBLEM_ANCHORS))
+	result := []string{}
+	for _, a := range anchors {
+		for _, attr := range a.Attr {
+			if attr.Key == "href" {
+				result = append(result, attr.Val)
+			}
+		}
+	}
+	return result, nil
+}
+
+// Return the link to a random question on rosetta
+func rosettaGetRandomQuestion() (string, error) {
+	rand.Seed(time.Now().Unix())
+	problems, err := rosettaGetProblemList()
+	if err != nil {
+		return "", fmt.Errorf("failed to retrieve problem list: %v", err)
+	}
+	randomProblem := problems[rand.Intn(len(problems))]
+	return ROSETTA_PAGE_ROOT + randomProblem, nil
+}
+
+// Construct a discord message embed from a rosetta problem link
+func popQuizQuestionToEmbed(url string) *discordgo.MessageEmbed {
+	return &discordgo.MessageEmbed{
+		URL:         url,
+		Type:        discordgo.EmbedTypeArticle,
+		Title:       ":alarm_clock: Pop Quiz :alarm_clock:",
+		Description: "Due right now!",
+		Thumbnail: &discordgo.MessageEmbedThumbnail{
+			URL: POP_QUIZ_ICON_URL,
+		},
+		Color: 0x1DA1F2,
 	}
 }

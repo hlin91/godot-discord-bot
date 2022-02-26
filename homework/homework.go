@@ -16,6 +16,10 @@ func init() {
 			Name: "assign-homework",
 			Type: discordgo.UserApplicationCommand,
 		},
+		{
+			Name: "pop-quiz",
+			Type: discordgo.UserApplicationCommand,
+		},
 	}
 	commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
 		"assign-homework": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -43,6 +47,33 @@ func init() {
 			_, err = s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
 				Content: fmt.Sprintf("<@%v>", i.ApplicationCommandData().TargetID),
 				Embeds:  []*discordgo.MessageEmbed{leetcodeQuestionToEmbed(questionUrl)},
+			})
+		},
+		"pop-quiz": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "",
+				},
+			})
+			if err != nil {
+				s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
+					Content: "Something went wrong",
+				})
+				return
+			}
+			questionUrl, err := rosettaGetRandomQuestion()
+			if err != nil {
+				if err != nil {
+					s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
+						Content: "Failed to retrieve question :(",
+					})
+					return
+				}
+			}
+			_, err = s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+				Content: fmt.Sprintf("<@%v>", i.ApplicationCommandData().TargetID),
+				Embeds:  []*discordgo.MessageEmbed{popQuizQuestionToEmbed(questionUrl)},
 			})
 		},
 	}

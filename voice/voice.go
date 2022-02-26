@@ -21,7 +21,7 @@ func init() {
 		},
 		{
 			Name:        "leave",
-			Description: "Just got paged",
+			Description: "Page me",
 		},
 		{
 			Name:        "stream",
@@ -108,7 +108,7 @@ func init() {
 				return
 			}
 			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-				Content: ":alarm_clock:Getting paged!:alarm_clock:",
+				Content: ":alarm_clock: Getting paged! :alarm_clock:",
 			})
 		},
 		"stream": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -181,7 +181,7 @@ func init() {
 				return
 			}
 			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-				Content: "Successfully skipped",
+				Content: "Playback has ceased",
 			})
 		},
 		"recess": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
