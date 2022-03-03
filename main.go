@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/harvlin/godot/code"
 	"github.com/harvlin/godot/homework"
 	"github.com/harvlin/godot/module"
 	"github.com/harvlin/godot/rss"
@@ -34,6 +35,7 @@ func init() {
 	modules = append(modules, rss.GetModule())
 	modules = append(modules, voice.GetModule())
 	modules = append(modules, homework.GetModule())
+	modules = append(modules, code.GetModule())
 }
 
 func init() {
