@@ -35,17 +35,12 @@ func init() {
 				},
 			})
 			if err != nil {
-				s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
-					Content: "Something went wrong",
-				})
 				return
 			}
 			questionUrl, err := leetcodeGetRandomQuestion()
 			if err != nil {
 				if err != nil {
-					s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
-						Content: "Failed to retrieve question :pensive:",
-					})
+					log.Printf("assign-homework: failed to retrieve question: %v", err)
 					return
 				}
 			}
@@ -105,9 +100,6 @@ func init() {
 					},
 				})
 				if err != nil {
-					s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
-						Content: "Something went wrong",
-					})
 					log.Printf("list_solutions: failed to respond to interaction: %v", err)
 				}
 				return

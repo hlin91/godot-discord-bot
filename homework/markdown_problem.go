@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
@@ -64,7 +65,7 @@ func fetchRandomMarkdownProblemContent(dir string) (string, error) {
 
 // Create the appropriate discord message content from a markdown problem
 func markdownProblemToMessageContent(p *problem) string {
-	return fmt.Sprintf("**%s**\n%s", p.Title, p.Body)
+	return fmt.Sprintf("**%s**\n%s", strings.TrimSpace(p.Title), p.Body)
 }
 
 // Construct a discord SelectMenu from the current cached problems
