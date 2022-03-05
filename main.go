@@ -29,6 +29,7 @@ var (
 
 var modules = []module.Module{}
 var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){}
+var componentHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){}
 
 func init() {
 	flag.Parse()
@@ -83,20 +84,27 @@ func main() {
 		log.Println("starting rss listener...")
 		tick := time.NewTicker(WAIT_TIME)
 		go rss.ListenerProcess(s, getChannelID(), tick, done, ret)
-		log.Println("bot is running...")
 	})
+
 	// Calls the corresponding handler for a command
 	session.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
-			h(s, i)
-		} else {
-			// Unregister the problematic command
-			v := i.ApplicationCommandData()
-			for _, g := range ug {
-				err := session.ApplicationCommandDelete(session.State.User.ID, g.ID, v.ID)
-				if err != nil {
-					log.Printf("could not delete '%v' command (id %v): %v", v.Name, v.ID, err)
+		switch i.Type {
+		case discordgo.InteractionApplicationCommand: // Handle normal commands
+			if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
+				h(s, i)
+			} else {
+				// Unregister the problematic command
+				v := i.ApplicationCommandData()
+				for _, g := range ug {
+					err := session.ApplicationCommandDelete(session.State.User.ID, g.ID, v.ID)
+					if err != nil {
+						log.Printf("could not delete '%v' command (id %v): %v", v.Name, v.ID, err)
+					}
 				}
+			}
+		case discordgo.InteractionMessageComponent: // Handle component commands
+			if h, ok := componentHandlers[i.MessageComponentData().CustomID]; ok {
+				h(s, i)
 			}
 		}
 	})
@@ -107,12 +115,12 @@ func main() {
 		log.Fatalf("could not open bot session: %v", err)
 	}
 	defer session.Close()
-
+	log.Printf("loading handlers...")
 	// Load command modules
 	for _, m := range modules {
-		m.Load(session, commandHandlers, *registerCommands)
+		m.Load(session, commandHandlers, componentHandlers, *registerCommands)
 	}
-
+	log.Printf("bot is ready")
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt)
 	<-stop

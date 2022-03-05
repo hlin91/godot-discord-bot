@@ -14,6 +14,7 @@ import (
 )
 
 const (
+	// Leetcode related constants
 	LEETCODE_PAGE_ROOT          = `https://leetcode.com`
 	LEETCODE_PROBLEM_SET        = `https://leetcode.com/problemset/all/`
 	LEETCODE_NAV_BUTTONS        = `nav[role="navigation"] button`
@@ -21,10 +22,11 @@ const (
 	LEETCODE_PROBLEM_DIFFICULTY = `div[diff]`
 	USER_AGENT                  = `Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:97.0) Gecko/20100101 Firefox/97.0`
 	LEETCODE_ICON_URL           = `https://avatars0.githubusercontent.com/u/48126122?s=280&v=4`
-	ROSETTA_PAGE_ROOT           = `https://rosettacode.org`
-	ROSETTA_PROBLEM_SET         = `https://rosettacode.org/wiki/Category:Programming_Tasks`
-	ROSETTA_PROBLEM_ANCHORS     = `div.mw-category-group ul li a`
-	POP_QUIZ_ICON_URL           = `https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books/blob/master/C++/cirno_teaches_c++.jpg?raw=true`
+	// Rosetta Code related constants
+	ROSETTA_PAGE_ROOT       = `https://rosettacode.org`
+	ROSETTA_PROBLEM_SET     = `https://rosettacode.org/wiki/Category:Programming_Tasks`
+	ROSETTA_PROBLEM_ANCHORS = `div.mw-category-group ul li a`
+	POP_QUIZ_ICON_URL       = `https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books/blob/master/C++/cirno_teaches_c++.jpg?raw=true`
 )
 
 type myJar struct {
@@ -197,7 +199,7 @@ func rosettaGetRandomQuestion() (string, error) {
 	return ROSETTA_PAGE_ROOT + randomProblem, nil
 }
 
-// Construct a discord message embed from a rosetta problem link
+// Construct a discord message embed from a problem link
 func popQuizQuestionToEmbed(url string) *discordgo.MessageEmbed {
 	return &discordgo.MessageEmbed{
 		URL:         url,

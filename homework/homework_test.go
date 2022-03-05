@@ -58,3 +58,35 @@ func TestRosettaGetRandomQuestion(t *testing.T) {
 	}
 	fmt.Printf("got %v problem(s): %v", len(result), result)
 }
+
+func TestFetchRandomMarkdownProblemContent(t *testing.T) {
+	result, err := fetchRandomMarkdownProblemContent("markdown_coding_problems")
+	if err != nil {
+		t.Errorf("error fetching random problem: %v", err)
+	}
+	if len(result) == 0 {
+		t.Errorf("content returned was empty")
+	}
+	fmt.Printf("got markdown content:\n%v", result)
+}
+
+func TestCreateProblem(t *testing.T) {
+	content, err := fetchRandomMarkdownProblemContent("markdown_coding_problems")
+	if err != nil {
+		t.Errorf("error fetching random problem: %v", err)
+	}
+	if len(content) == 0 {
+		t.Errorf("content returned was empty")
+	}
+	result := createProblem(content)
+	if len(result.Title) == 0 {
+		t.Errorf("got empty title")
+	}
+	if len(result.Body) == 0 {
+		t.Errorf("got empty body")
+	}
+	if len(result.Solution) == 0 {
+		t.Errorf("got empty solution")
+	}
+	fmt.Printf("created problem struct: %v", result)
+}

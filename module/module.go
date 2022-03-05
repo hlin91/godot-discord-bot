@@ -8,23 +8,26 @@ import (
 
 // Module groups together commands and handlers for registration with the discord session
 type Module struct {
-	commands []*discordgo.ApplicationCommand
-	handlers map[string]func(*discordgo.Session, *discordgo.InteractionCreate)
+	commands          []*discordgo.ApplicationCommand
+	handlers          map[string]func(*discordgo.Session, *discordgo.InteractionCreate)
+	componentHandlers map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate)
 }
 
 // Load registers the commands and handlers with the discord session
-func (m *Module) Load(session *discordgo.Session, commandHandlers map[string]func(*discordgo.Session, *discordgo.InteractionCreate), register bool) {
+func (m *Module) Load(session *discordgo.Session, commandHandlers map[string]func(*discordgo.Session, *discordgo.InteractionCreate), componentHandlers map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate), register bool) {
 	loadHandlers(commandHandlers, m.handlers)
+	loadHandlers(componentHandlers, m.componentHandlers)
 	if register {
 		registerCommands(session, m.commands)
 	}
 }
 
 // CreateModule constructs a Module with a given set of commands and handlers
-func CreateModule(commands []*discordgo.ApplicationCommand, handlers map[string]func(*discordgo.Session, *discordgo.InteractionCreate)) Module {
+func CreateModule(commands []*discordgo.ApplicationCommand, handlers map[string]func(*discordgo.Session, *discordgo.InteractionCreate), componentHandlers map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate)) Module {
 	return Module{
-		commands: commands,
-		handlers: handlers,
+		commands:          commands,
+		handlers:          handlers,
+		componentHandlers: componentHandlers,
 	}
 }
 
