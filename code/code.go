@@ -43,24 +43,18 @@ func init() {
 				},
 			})
 			if err != nil {
-				s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
-					Content: "Something went wrong",
-				})
+				log.Printf("code-block: failed to respond to interaction: %v", err)
 				return
 			}
 			err = makeCodeBlock(i.ApplicationCommandData().Resolved.Messages[i.ApplicationCommandData().TargetID].Content)
 			if err != nil {
-				s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
-					Content: "Failed to generate image",
-				})
+				log.Printf("code-block: failed to create code-block: %v", err)
 				return
 			}
 			file, err := os.Open(TEMP_IMG_FILE)
 			if err != nil {
 				if err != nil {
-					s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
-						Content: "Failed to open image",
-					})
+					log.Printf("code-block: failed to open image: %v", err)
 					return
 				}
 			}

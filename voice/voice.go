@@ -54,9 +54,7 @@ func init() {
 				},
 			})
 			if err != nil {
-				s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
-					Content: "Something went wrong",
-				})
+				log.Printf("join: failed to respond to interaction: %v", err)
 				return
 			}
 			if i.Member == nil {
@@ -93,9 +91,7 @@ func init() {
 				},
 			})
 			if err != nil {
-				s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
-					Content: "Something went wrong",
-				})
+				log.Printf("leave: failed to respond to interaction: %v", err)
 				return
 			}
 			err = LeaveVoice(i.GuildID)
@@ -119,9 +115,7 @@ func init() {
 				},
 			})
 			if err != nil {
-				s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
-					Content: "Something went wrong",
-				})
+				log.Printf("stream: failed to respond to interaction: %v", err)
 				return
 			}
 			info, err := UrlToEmbed(i.ApplicationCommandData().Options[0].StringValue())
@@ -168,9 +162,7 @@ func init() {
 				},
 			})
 			if err != nil {
-				s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
-					Content: "Something went wrong",
-				})
+				log.Printf("cease: failed to respond to interaction: %v", err)
 				return
 			}
 			err = Skip(i.GuildID)
@@ -192,9 +184,7 @@ func init() {
 				},
 			})
 			if err != nil {
-				s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
-					Content: "Something went wrong",
-				})
+				log.Printf("recess: failed to respond to interaction: %v", err)
 				return
 			}
 			err = Pause(i.GuildID)

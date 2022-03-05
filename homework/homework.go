@@ -136,9 +136,6 @@ func init() {
 					},
 				})
 				if err != nil {
-					s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
-						Content: "Something went wrong",
-					})
 					log.Printf("show_solution: failed to respond: %v", err)
 				}
 				return
@@ -159,7 +156,7 @@ func init() {
 				err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
-						Content: "This solution is too large. Uploading as a file...",
+						Content: "This solution is too large. Uploading as a file :file_folder:",
 						Files: []*discordgo.File{
 							{
 								Name:        "solution.md",
@@ -179,9 +176,6 @@ func init() {
 				},
 			})
 			if err != nil {
-				s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
-					Content: "Something went wrong",
-				})
 				log.Printf("show_solution: failed to respond to interaction: %v", err)
 			}
 			delete(getProblemByTitle, data.Values[0])
