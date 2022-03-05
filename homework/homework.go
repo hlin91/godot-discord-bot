@@ -57,17 +57,13 @@ func init() {
 				},
 			})
 			if err != nil {
-				s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
-					Content: "Something went wrong",
-				})
+				log.Printf("pop-quiz: failed to respond to interaction: %v", err)
 				return
 			}
 			problemContent, err := fetchRandomMarkdownProblemContent(PROBLEMS_DIR)
 			if err != nil {
 				if err != nil {
-					s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
-						Content: "Failed to retrieve problem :pensive:",
-					})
+					log.Printf("pop-quiz: failed to fetch problem: %v", err)
 					return
 				}
 			}
@@ -105,6 +101,9 @@ func init() {
 				return
 			}
 			selectMenuOptions := getSelectMenuOptionsFromCachedProblems()
+			if len(selectMenuOptions) == 0 {
+				log.Printf("list_solutions: warning: selectMenuOptions is empty")
+			}
 			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
@@ -149,17 +148,11 @@ func init() {
 				// Solution is over 2000 chars so we have to upload it as a file
 				err := ioutil.WriteFile(TMP_SOLUTION_FILE, []byte(solution), fs.ModePerm)
 				if err != nil {
-					s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
-						Content: "Something went wrong",
-					})
 					log.Printf("show_solution: failed to write file %v: %v", TMP_SOLUTION_FILE, err)
 					return
 				}
 				file, err := os.Open(TMP_SOLUTION_FILE)
 				if err != nil {
-					s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
-						Content: "Something went wrong",
-					})
 					log.Printf("show_solution: failed to open file %v: %v", TMP_SOLUTION_FILE, err)
 					return
 				}
@@ -167,11 +160,13 @@ func init() {
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
 						Content: "This solution is too large. Uploading as a file...",
-						Files: []*discordgo.File{&discordgo.File{
-							Name:        "solution.md",
-							ContentType: "multipart/form-data",
-							Reader:      file,
-						}},
+						Files: []*discordgo.File{
+							{
+								Name:        "solution.md",
+								ContentType: "multipart/form-data",
+								Reader:      file,
+							},
+						},
 					},
 				})
 				delete(getProblemByTitle, data.Values[0])
