@@ -52,9 +52,7 @@ func init() {
 				},
 			})
 			if err != nil {
-				s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
-					Content: "Something went wrong",
-				})
+				log.Printf("test_rss: failed to respond to interaction: %v", err)
 				return
 			}
 			// Do RSS stuff here
