@@ -14,8 +14,8 @@ import (
 const (
 	PROBLEMS_DIR              = `./homework/markdown_coding_problems`
 	MARKDOWN_PROBLEM_TITLE    = `(?m)^#[[:blank:]]*([^#])+$`
-	MARKDOWN_PROBLEM_BODY     = `(?si)##[[:blank:]]*The (problem)?(task)?(.*)##[[:blank:]]*(The )?solution` // The last line matched is not needed
-	MARKDOWN_PROBLEM_SOLUTION = `(?si)##[[:blank:]]*(The )?solution(.*)(&nbsp;)?`
+	MARKDOWN_PROBLEM_BODY     = `(?si)##[[:blank:]]*(The )?(problem)?(task)?(.*)##[[:blank:]]*(The )?solution` // The last line matched is not needed
+	MARKDOWN_PROBLEM_SOLUTION = `(?si)##[[:blank:]]*(The )?solution(.*)`
 	TMP_SOLUTION_FILE         = `/tmp/solution.md`
 )
 
