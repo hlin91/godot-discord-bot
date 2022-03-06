@@ -25,10 +25,10 @@ type problem struct {
 	Solution string
 }
 
-var getProblemByMessageContent map[string]*problem
+var getProblemByInteractionId map[string]*problem
 
 func init() {
-	getProblemByMessageContent = map[string]*problem{}
+	getProblemByInteractionId = map[string]*problem{}
 }
 
 // Construct a problem struct from markdown content fed as a string
@@ -76,10 +76,10 @@ func messageContentToProblemContent(content string) string {
 // Construct a discord SelectMenu from the current cached problems
 func getSelectMenuOptionsFromCachedProblems() []discordgo.SelectMenuOption {
 	result := []discordgo.SelectMenuOption{}
-	for _, p := range getProblemByMessageContent {
+	for key, p := range getProblemByInteractionId {
 		result = append(result, discordgo.SelectMenuOption{
 			Label:       p.Title,
-			Value:       markdownProblemToMessageContent(p),
+			Value:       key,
 			Default:     false,
 			Description: "Show the solution for this problem",
 		})

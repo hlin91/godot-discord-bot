@@ -5,7 +5,7 @@ go 1.17
 
 require (
 	github.com/andybalholm/cascadia v1.3.1
-	github.com/bwmarrin/discordgo v0.23.3-0.20211027235626-007bf7679048
+	github.com/bwmarrin/discordgo v0.24.0
 	github.com/jonas747/dca v0.0.0-20210930103944-155f5e5f0cc7
 	github.com/mmcdole/gofeed v1.1.3
 	golang.design/x/code2img v0.1.4

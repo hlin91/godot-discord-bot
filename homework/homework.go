@@ -71,7 +71,7 @@ func init() {
 				}
 			}
 			problem := createProblem(problemContent)
-			getProblemByMessageContent[markdownProblemToMessageContent(problem)] = problem
+			getProblemByInteractionId[i.Interaction.ID] = problem
 			_, err = s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
 				Content: fmt.Sprintf("<@%v>\n***Pop quiz!***\n", i.ApplicationCommandData().TargetID) + markdownProblemToMessageContent(problem),
 				Components: []discordgo.MessageComponent{
@@ -94,7 +94,7 @@ func init() {
 	}
 	componentHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
 		"list_solutions": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-			if len(getProblemByMessageContent) == 0 {
+			if len(getProblemByInteractionId) == 0 {
 				err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
@@ -139,8 +139,7 @@ func init() {
 			}
 		},
 		"show_solution": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-			content := messageContentToProblemContent(i.Message.Content)
-			problem, ok := getProblemByMessageContent[content]
+			problem, ok := getProblemByInteractionId[i.Message.Interaction.ID]
 			if !ok {
 				err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
@@ -182,7 +181,7 @@ func init() {
 				if err != nil {
 					log.Printf("show_solution: failed to respond to interaction: %v", err)
 				}
-				delete(getProblemByMessageContent, content)
+				delete(getProblemByInteractionId, i.Message.Interaction.ID)
 				return
 			}
 			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
@@ -194,7 +193,7 @@ func init() {
 			if err != nil {
 				log.Printf("show_solution: failed to respond to interaction: %v", err)
 			}
-			delete(getProblemByMessageContent, content)
+			delete(getProblemByInteractionId, i.Message.Interaction.ID)
 		},
 	}
 }

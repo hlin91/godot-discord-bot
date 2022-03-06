@@ -2,6 +2,7 @@ package discordgo
 
 import (
 	"encoding/json"
+	"fmt"
 )
 
 // ComponentType is type of component.
@@ -12,6 +13,7 @@ const (
 	ActionsRowComponent ComponentType = 1
 	ButtonComponent     ComponentType = 2
 	SelectMenuComponent ComponentType = 3
+	TextInputComponent  ComponentType = 4
 )
 
 // MessageComponent is a base interface for all message components.
@@ -34,22 +36,29 @@ func (umc *unmarshalableMessageComponent) UnmarshalJSON(src []byte) error {
 		return err
 	}
 
-	var data MessageComponent
 	switch v.Type {
 	case ActionsRowComponent:
-		v := ActionsRow{}
-		err = json.Unmarshal(src, &v)
-		data = v
+		umc.MessageComponent = &ActionsRow{}
 	case ButtonComponent:
-		v := Button{}
-		err = json.Unmarshal(src, &v)
-		data = v
+		umc.MessageComponent = &Button{}
+	case SelectMenuComponent:
+		umc.MessageComponent = &SelectMenu{}
+	case TextInputComponent:
+		umc.MessageComponent = &TextInput{}
+	default:
+		return fmt.Errorf("unknown component type: %d", v.Type)
 	}
+	return json.Unmarshal(src, umc.MessageComponent)
+}
+
+// MessageComponentFromJSON is a helper function for unmarshaling message components
+func MessageComponentFromJSON(b []byte) (MessageComponent, error) {
+	var u unmarshalableMessageComponent
+	err := u.UnmarshalJSON(b)
 	if err != nil {
-		return err
+		return nil, fmt.Errorf("failed to unmarshal into MessageComponent: %w", err)
 	}
-	umc.MessageComponent = data
-	return err
+	return u.MessageComponent, nil
 }
 
 // ActionsRow is a container for components within one row.
@@ -166,11 +175,12 @@ type SelectMenu struct {
 	// The text which will be shown in the menu if there's no default options or all options was deselected and component was closed.
 	Placeholder string `json:"placeholder"`
 	// This value determines the minimal amount of selected items in the menu.
-	MinValues int `json:"min_values,omitempty"`
+	MinValues *int `json:"min_values,omitempty"`
 	// This value determines the maximal amount of selected items in the menu.
 	// If MaxValues or MinValues are greater than one then the user can select multiple items in the component.
 	MaxValues int                `json:"max_values,omitempty"`
 	Options   []SelectMenuOption `json:"options"`
+	Disabled  bool               `json:"disabled"`
 }
 
 // Type is a method to get the type of a component.
@@ -190,3 +200,42 @@ func (m SelectMenu) MarshalJSON() ([]byte, error) {
 		Type:       m.Type(),
 	})
 }
+
+// TextInput represents text input component.
+type TextInput struct {
+	CustomID    string         `json:"custom_id"`
+	Label       string         `json:"label"`
+	Style       TextInputStyle `json:"style"`
+	Placeholder string         `json:"placeholder,omitempty"`
+	Value       string         `json:"value,omitempty"`
+	Required    bool           `json:"required,omitempty"`
+	MinLength   int            `json:"min_length,omitempty"`
+	MaxLength   int            `json:"max_length,omitempty"`
+}
+
+// Type is a method to get the type of a component.
+func (TextInput) Type() ComponentType {
+	return TextInputComponent
+}
+
+// MarshalJSON is a method for marshaling TextInput to a JSON object.
+func (m TextInput) MarshalJSON() ([]byte, error) {
+	type inputText TextInput
+
+	return json.Marshal(struct {
+		inputText
+		Type ComponentType `json:"type"`
+	}{
+		inputText: inputText(m),
+		Type:      m.Type(),
+	})
+}
+
+// TextInputStyle is style of text in TextInput component.
+type TextInputStyle uint
+
+// Text styles
+const (
+	TextInputShort     TextInputStyle = 1
+	TextInputParagraph TextInputStyle = 2
+)
