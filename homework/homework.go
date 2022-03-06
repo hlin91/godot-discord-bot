@@ -70,7 +70,7 @@ func init() {
 			problem := createProblem(problemContent)
 			getProblemByTitle[problem.Title] = problem
 			_, err = s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-				Content: fmt.Sprintf("<@%v>Pop quiz!\n", i.ApplicationCommandData().TargetID) + markdownProblemToMessageContent(problem),
+				Content: fmt.Sprintf("<@%v>\n***Pop quiz!***\n", i.ApplicationCommandData().TargetID) + markdownProblemToMessageContent(problem),
 				Components: []discordgo.MessageComponent{
 					discordgo.ActionsRow{
 						Components: []discordgo.MessageComponent{
