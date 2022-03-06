@@ -71,7 +71,7 @@ func init() {
 				}
 			}
 			problem := createProblem(problemContent)
-			getProblemByTitle[problem.Title] = problem
+			getProblemByMessageContent[markdownProblemToMessageContent(problem)] = problem
 			_, err = s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
 				Content: fmt.Sprintf("<@%v>\n***Pop quiz!***\n", i.ApplicationCommandData().TargetID) + markdownProblemToMessageContent(problem),
 				Components: []discordgo.MessageComponent{
@@ -94,7 +94,7 @@ func init() {
 	}
 	componentHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
 		"list_solutions": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-			if len(getProblemByTitle) == 0 {
+			if len(getProblemByMessageContent) == 0 {
 				err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
@@ -139,8 +139,8 @@ func init() {
 			}
 		},
 		"show_solution": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-			title := markdownProblemMessageContentToTitle(i.Message.Content)
-			problem, ok := getProblemByTitle[title]
+			content := messageContentToProblemContent(i.Message.Content)
+			problem, ok := getProblemByMessageContent[content]
 			if !ok {
 				err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
@@ -182,7 +182,7 @@ func init() {
 				if err != nil {
 					log.Printf("show_solution: failed to respond to interaction: %v", err)
 				}
-				delete(getProblemByTitle, title)
+				delete(getProblemByMessageContent, content)
 				return
 			}
 			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
@@ -194,7 +194,7 @@ func init() {
 			if err != nil {
 				log.Printf("show_solution: failed to respond to interaction: %v", err)
 			}
-			delete(getProblemByTitle, title)
+			delete(getProblemByMessageContent, content)
 		},
 	}
 }
