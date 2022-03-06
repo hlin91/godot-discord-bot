@@ -100,29 +100,36 @@ func init() {
 				}
 				return
 			}
+			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "",
+				},
+			})
+			if err != nil {
+				log.Printf("list_solutions: failed to respond to interaction: %v", err)
+				return
+			}
 			selectMenuOptions := getSelectMenuOptionsFromCachedProblems()
 			if len(selectMenuOptions) == 0 {
 				log.Printf("list_solutions: warning: selectMenuOptions is empty")
 			}
-			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Content: "Which solution do you want to see?",
-					Components: []discordgo.MessageComponent{
-						discordgo.ActionsRow{
-							Components: []discordgo.MessageComponent{
-								discordgo.SelectMenu{
-									CustomID:    "show_solution",
-									Placeholder: "Choose a solution",
-									Options:     selectMenuOptions,
-								},
+			_, err = s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+				Content: "Which solution do you want to see?",
+				Components: []discordgo.MessageComponent{
+					discordgo.ActionsRow{
+						Components: []discordgo.MessageComponent{
+							discordgo.SelectMenu{
+								CustomID:    "show_solution",
+								Placeholder: "Choose a solution",
+								Options:     selectMenuOptions,
 							},
 						},
 					},
 				},
 			})
 			if err != nil {
-				log.Printf("list_solutions: failed to respond to interaction: %v", err)
+				log.Printf("list_solutions: failed to edit interaction: %v", err)
 			}
 		},
 		"show_solution": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
