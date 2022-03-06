@@ -26,7 +26,7 @@ print('-----------------------')
 print(lst[:4] + lst[4+1])
 ```
 
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 
 ## Solution
@@ -59,7 +59,7 @@ for perm in get_permutation(data):
    print (perm)
 ```
 
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 
 ## Explanation
@@ -83,8 +83,8 @@ This will create [3, 2, 1]. That’s why we did [current] + p  to make the final
 This code is harder. It will take a few practices to become comfortable with it.
 
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](Generate-Sentences.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`

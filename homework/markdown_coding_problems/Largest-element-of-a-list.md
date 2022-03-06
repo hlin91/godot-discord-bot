@@ -23,7 +23,7 @@ largest = get_largest(my_nums)
  
 print('The largest number is: ', largest)
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Explanation
 In the beginning, consider the first element of the list as the largest element. 
@@ -43,7 +43,7 @@ nums = [41, 69, 23, 45, 19, 8]
 largest = max(nums)
 print(largest)
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Quiz
 What is the easiest way to find the largest number in a list?
@@ -56,9 +56,9 @@ What is the easiest way to find the largest number in a list?
 
 Use the max function to get the largest number in a list.
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](Sum-of-squares.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`
 

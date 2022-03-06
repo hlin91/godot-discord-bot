@@ -30,7 +30,7 @@ lcm = calculate_lcm(num1, num2)
 print(f"LCM of {num1} and {num2} is: {lcm}")
 ```
 
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Explanation
 First, we calculate the greater number, because LCM will be equal or higher than the highest of the two numbers. 
@@ -47,9 +47,9 @@ It's actually much easier than it seems.
 
 
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](../Programming-Contest/Programming-Contest.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`
 

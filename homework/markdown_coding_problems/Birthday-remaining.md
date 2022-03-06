@@ -17,7 +17,7 @@ print(random.randint(30,40))
 print(random.randint(40,50))
 ```
  
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 
 The problem is that, in every line, you have to type random.randint. As a programmer, you will be lazy. Hence, while import you can import the randint directly in your code. For that, you have to say, from random import randint. Like below:
@@ -31,7 +31,7 @@ print(randint(30,40))
 print(randint(40,50))
 ```
  
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Solution
 The code below is submitted by Programmer Karim...
@@ -90,8 +90,8 @@ That’s a pretty simple way to get the days remaining for your next birthday.
 Isn’t it cool? 
 
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](Calculate-age.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`

@@ -49,7 +49,7 @@ if check_armstrong(num):
 else:
 	print(num,"is not an Armstrong number")
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Explanation
 Three things could be new for you. 
@@ -78,9 +78,9 @@ return result
 ```
 
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](Greatest-common-divisor.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`
 

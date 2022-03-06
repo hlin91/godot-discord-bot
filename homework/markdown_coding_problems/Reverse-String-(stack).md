@@ -32,7 +32,7 @@ reverse = reverse_stack(usr_str)
 print('Reversed is: ', reverse)
 ```
 
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Explanation
 In the function, we declared a list named stack. And then we loop through the input string and put every character of the string inside the list. 
@@ -49,9 +49,9 @@ Hence, the last element will come first and you will put it in the first positio
 
 If needed, add a print command to see how it works.
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](Reverse-String-(recursive).md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`
 

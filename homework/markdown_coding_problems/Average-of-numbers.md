@@ -19,7 +19,7 @@ That’s it, you will get the answer.
 
 Want to try it yourself first? Go to the code editor and try it.
 
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 
 ## Solution
@@ -37,7 +37,7 @@ avg = total/len
 print("Average of elements you entered",round(avg,2))
 ```
 
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Explanation
 First, ask the user how many numbers he/she wants to enter. Once we have the number, run a for loop. To collect the numbers. 
@@ -61,7 +61,7 @@ for i in range(0,len):
 avg = total/len
 print("Average of elements you entered",round(avg,2))
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Explanation
 In the second approach, other than directly adding to the list, we are adding it to the total variable. And then we are dividing it by the number of input the user entered. 
@@ -69,8 +69,8 @@ In the second approach, other than directly adding to the list, we are adding it
 ## Take Away
 > To get the average, calculate the total and divide by the number of elements.
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](Divisible-by-3-and-5.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving` 

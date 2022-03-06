@@ -21,7 +21,7 @@ user_input = input('what is your string:')
 no_duplicate = remove_duplicate(user_input)
 print('Without duplicate: ', no_duplicate)
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Explanation
 We just created a function. In the function, we are taking a string as an input. 
@@ -52,9 +52,9 @@ How would you check whether a character exists in a string?
 The not in is just the opposite check of in.
 
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](../Conversions/Miles-to-Kilometers.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`
 

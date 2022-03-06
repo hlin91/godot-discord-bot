@@ -27,7 +27,7 @@ gcd = compute_gcd(num1, num2)
 
 print("GCD of", num1,"and", num2,"is", gcd)
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Explanation
 Since we are trying to find the number that divides both numbers, the dividing number will as big as the smallest number. 
@@ -56,7 +56,7 @@ b=int(input("Enter second number:"))
 GCD=gcd(a,b)
 print("GCD is: ", GCD)
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## built-in GCD
 Python has a built-in method to calculate gcd. You can use that one as well. 
@@ -73,9 +73,9 @@ print(gcd)
 
 
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](Least-Common-Multiple.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`
 

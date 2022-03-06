@@ -30,7 +30,7 @@ else:
    print('Your number is not a Prime')
 ```
 
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ###   Explanation
 The core part of the algorithm is the is_prime function. 
@@ -55,8 +55,8 @@ There are other solutions to this problem as well. We encourage you to google, â
 ##   Take Away
 A prime number is only divisible by 1 and the number itself. 
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](Prime-Numbers.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`

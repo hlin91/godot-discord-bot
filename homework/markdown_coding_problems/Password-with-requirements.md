@@ -16,7 +16,7 @@ print('All uppercase characters')
 print(string.ascii_uppercase)
 ```
  
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Solution
 ```python
@@ -40,7 +40,7 @@ print ("First Random Password is:", randomPassword(pass_len))
 print ("Second Random Password is:", randomPassword(pass_len))
 print ("Third Random Password is:", randomPassword(pass_len))
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Explanation
 The all_chars variable is the same as before. After that, we created a password variable with an empty string. 
@@ -54,8 +54,8 @@ Make sense?
 Keep going. Only a few more left. I am sure you can do it 
 
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](Permutations.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`

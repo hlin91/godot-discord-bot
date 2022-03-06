@@ -19,7 +19,7 @@ Otherwise, the first number will be the largest.
 
 Think about it. And try yourself first.
 
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Solution
 ```python
@@ -39,7 +39,7 @@ else:
 print("Largest number you entered is: ",largest)
 ```
 
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ####   Shortcut
 Another simple and alternative solution is to send the numbers to the max function. 
@@ -53,7 +53,7 @@ largest = max(num1, num2, num3)
 print("Largest number you entered is: ",largest)
 ```
 
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Quiz
 What is the easiest way to find out the largest number?
@@ -70,8 +70,8 @@ What is the easiest way to find out the largest number?
 ## Take Away
 Use the max function to get the largest number.
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](Average-of-numbers.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving` 

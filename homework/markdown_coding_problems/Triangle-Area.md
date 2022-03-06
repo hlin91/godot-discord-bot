@@ -31,7 +31,7 @@ s = (a + b + c) / 2
 area = math.sqrt(s*(s-a)*(s-b)*(s-c))
 print('Area of your triangle is ', area)
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Explanation
 To calculate the square root. We used the math module. And call math.sqrt. 
@@ -63,8 +63,8 @@ How would you calculate the square root of a number.
 The math module has a lot of math-related functionalities. 
 
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](../Prime-number/Check-Prime.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`

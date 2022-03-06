@@ -31,7 +31,7 @@ print('hello' + 'world')
 print('h'+'w')
 ```
 
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 However, a string is not a list.
 
@@ -49,7 +49,7 @@ result = reverse_string(str)
 print(result)
 ```
  
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Explanation
 A simple trick will make it work. 
@@ -100,8 +100,8 @@ Will you be able to append, remove or set a character to string by the index?
 A string is an immutable ordered sequence. 
 
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](Reverse-String-(stack).md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`

@@ -37,13 +37,13 @@ num = int (input('Enter your number: '))
 factors = get_prime_factors(num)
 print(factors)
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## take Away
 Prime factor is a prime number that divides the provided number. 
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](Smallest-prime-factor.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`

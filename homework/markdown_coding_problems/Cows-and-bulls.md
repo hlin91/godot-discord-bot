@@ -92,8 +92,8 @@ Then we display the bulls and cows.
 Finally, if there is no remaining try (remaining try < 1), print that user lost.
 
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](Cows-and-bulls(4digits).md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`

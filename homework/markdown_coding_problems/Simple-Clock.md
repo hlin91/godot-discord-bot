@@ -28,7 +28,7 @@ result = double_global_x(x)
 print(result)
 print('Updated value of x:', x)
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 If you want to change the value of the variable inside a function, you have to use the global keyword. Just add a new line and put global and then the name of the variable. In that case, python will know that it will read and set value from the variable outside of the function. For example, in the code below the value of the x will become 10. 
 
@@ -46,7 +46,7 @@ print(result)
 print('Updated value of x:', x)
 ```
 
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Time module
 There is a built-in module in python named time. It has a lot of time-related functionalities. One function on the time module is called sleep. The sleep takes a parameter named sec. 
@@ -62,7 +62,7 @@ while True:
  time.sleep(1)
  print('Tick')
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## The solution
 This code is submitted by: Steine Chaos / Malte Lupin
@@ -101,7 +101,7 @@ while True:
 	add()
 	display()
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## How it works
 The code is simple...We imported the time module, then, asked the user for three inputs: for the current hour, minute, and second. 
@@ -125,8 +125,8 @@ Similarly, if the minute becomes 60, we add 1 hour and set minutes to 0, because
 Finally, if the hour is 24, we reset the hour to 0. Because, in a digital clock, there are no 24 or 25 hours. After 23 hours, it becomes 0 hours again (the midnight!) 
 
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](Birthday-remaining.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`

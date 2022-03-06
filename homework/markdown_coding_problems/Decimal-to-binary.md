@@ -43,7 +43,7 @@ num = int(input("Your decimal number: "))
 binary = dec_to_binary(num)
 print("Your binary is:", binary)
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Explanation
 You have seen the remainder and dividing the number with // before. That is the core part of this decimal to a binary algorithm. 
@@ -93,8 +93,8 @@ Binary numbers use 0 and 1 only.
 
 
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](Decimal-to-binary-recursive.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`

@@ -29,7 +29,7 @@ rand = random.randint(20,40)
 print(rand)
 ```
 
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 The above code will generate a random number between 20 and 40. 
 
@@ -53,7 +53,7 @@ while True:
       print('Your guess did not match')
       print('The number was:', num)
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Explanation
 Since we want to create a random number between 0 to 10 we used randint(0,10)
@@ -67,8 +67,8 @@ That’s why we put the int after the check for q.
 The bottom part of the code should be easier for you.
 
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](Rock-paper-scissor.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`

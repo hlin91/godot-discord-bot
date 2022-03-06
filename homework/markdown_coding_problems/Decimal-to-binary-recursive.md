@@ -22,7 +22,7 @@ dec_to_binary(num)
 print(" ")
 ```
 
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Explanation
 The core part of the logic is simple. If the number is greater than 1, call the dec_to_binary function again. And, while calling, send the result of dividing operation as the input number. 
@@ -41,8 +41,8 @@ The purpose of end='' is to print the output in the same line. If you don’t ad
 There are multiple ways to format the print string. Google it, when needed.
 
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](../Solution-Strategy.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`

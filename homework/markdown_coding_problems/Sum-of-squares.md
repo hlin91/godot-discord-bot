@@ -24,7 +24,7 @@ sum = square_sum(num)
 
 print('sum of square numbers is ', sum)
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Explanation
 This one is super easy. You declared a variable sum with an initial value 0.
@@ -41,13 +41,13 @@ If needed, go to the code editor and run the following code.
 for i in range(10):
 	print(i)
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 And then run
 ```python
 for i in range(11):
 	print(i)
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 
 ## Shortcut
@@ -69,7 +69,7 @@ num = int(input('Enter a number: '))
 sum = sum_of_square2(num)
 print('Your sum of Square is: ', sum)
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Quiz
 
@@ -87,9 +87,9 @@ Why you should learn problem-solving from multiple sources?
 ## Take Away
 Knowing shortcut ways will make you smarter and faster.
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](Second-Largest.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`
 

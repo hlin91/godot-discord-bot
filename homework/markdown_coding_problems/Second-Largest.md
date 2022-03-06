@@ -24,7 +24,7 @@ my_nums = [44,11,83,29,25,76,88]
 second_largest = get_second_largest(my_nums)
 print("Second highest number is : ",second_largest)
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Explanation
 We declared two variables. One is called the largest. Another one is second_largest. We started both with the value of the first element of the list. 
@@ -58,15 +58,15 @@ nums.remove(max(nums))
 second_largest = max(nums)
 print(second_largest)
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 
 ## Take Away
 Clever ways to solve problems will make you happier.
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](Second-smallest.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`
 

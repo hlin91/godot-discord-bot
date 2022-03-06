@@ -21,7 +21,7 @@ nums = [13,89,65,42,12,11,56]
 total = get_sum(nums)
 print("The total of each elements:",total)
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Explanation
 It’s super simple. 
@@ -60,8 +60,8 @@ What is the shortcut way to sum all the numbers in a list?
 ## Take Away
 Use the sum function to sum all the numbers in a list.
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](../Loop-Related/Sum-of-elements.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving` 

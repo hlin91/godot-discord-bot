@@ -30,15 +30,15 @@ elif avg >=60:
 else:
    print("Grade: F")
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ##  Explanation
 Calculation of average is easy. Add them all and then divide by the count. As we are taking numbers for 5 subjects we are dividing the total by 5. 
 
 After that, we are running a simple if-else to determine the grade. 
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](Gravitational-Force.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`

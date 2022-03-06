@@ -46,7 +46,7 @@ while remaining_try > 0:
            print("You lost the game.")
            break
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Explanation
 After solving the Bulls and cows for 2 digits, this one should become easier for you. 
@@ -56,8 +56,8 @@ However, solving this one by using if-else that we did for 2 digit bulls and cow
 That's why we created the get_bulls_cows function. Inside that, we created a loop. For each digit, check the digit in the same place. 
 
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](Word-completion.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`

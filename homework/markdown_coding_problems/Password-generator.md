@@ -23,7 +23,7 @@ print('all special characters')
 print(string.punctuation)
 ```
 
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Solution
 ```python
@@ -42,7 +42,7 @@ pass_len = int(input('How many characters in your password?'))
 new_password = generate_password(pass_len)
 print('Your new password: ', new_password)
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 
 ## Explanation
@@ -51,8 +51,8 @@ The solution is rather simple. We imported the random module and the string modu
 For that, we ran a for loop. In the loop, we select a random letter from the all_chars. To select a random character, we used random.choice. Then we add the random character to the password. 
 
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](Password-with-requirements.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`

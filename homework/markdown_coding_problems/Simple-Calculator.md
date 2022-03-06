@@ -50,7 +50,7 @@ else:
  
 print(num1, operation, num2, '=', result)
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 
 ## How it works
@@ -63,8 +63,8 @@ Then we have if-elif-else. And based on the operation, we call the right method 
 That’s it. 
 
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](Password-generator.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`

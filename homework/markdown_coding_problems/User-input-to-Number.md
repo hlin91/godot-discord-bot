@@ -19,7 +19,7 @@ result = int_num * float_num
 print("Your result is: ", result)
 ```
 
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Shortcut
 > You wrote input in one line and then in the next line you used int or float to convert the number. You can write the two lines in one line. Like below 
@@ -31,7 +31,7 @@ result = int_num * float_num
 print('Your result is: ', result)
 ```
 
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Going Forward
 Going forward, we will write input and conversion in one line.
@@ -52,8 +52,8 @@ Which one is used to convert string to a number?
 
 Use int or float to convert user input to a number. <br>
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](Math-Power.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`

@@ -19,7 +19,7 @@ a = b
 b = temp
 print('a, b', a, b)
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Shortcut
 You can use a python shortcut to swap two variables as well. How this works, would be a little bit tricky for you. So, for now, just remember it.
@@ -32,7 +32,7 @@ print('x, y', x, y)
 x, y = y, x
 print('x, y', x, y)
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Another solution
 If both the variable is number, you can apply other tricks. Like the one below-
@@ -47,7 +47,7 @@ b = a - b
 a = a - b
 print('a, b', a, b)
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Quiz
 How would you swap two variables?
@@ -64,9 +64,9 @@ How would you swap two variables?
 ## Take Away
 Use temp variable to swap two variables. <br>
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](../Number-Related/max-of-two.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`
 

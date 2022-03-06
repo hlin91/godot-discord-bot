@@ -27,7 +27,7 @@ total_due = compound_interest(principle, interest_rate, time)
 print("Interest Amount is:", total_due)
 ```
 
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Explanation
 Inside the function, just look into the power calculation. 
@@ -40,8 +40,8 @@ Rest of the part should be easy for you.
 To apply the same power on multiple things, put them inside parentheses and then apply the power. 
 
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](Calculate-Grades.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`

@@ -27,7 +27,7 @@ result = cube_sum(user_num)
 print('Your sum of cubes are: ', result)
 ```
 
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Think Different
 There is an alternative solution to calculate the sum of cube of the n numbers. You can use
@@ -43,14 +43,14 @@ sum = (n*(n+1)/2)**2
 print('Your sum of cubes are: ', sum)
 ```
 
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Take Away
 Sum of a series might have an easier formula.
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](Armstrong-number.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`
 

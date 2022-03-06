@@ -8,7 +8,7 @@ For a given number, find all the numbers smaller than the number. Numbers should
 So, you have to check two conditions: make sure the number is divisible by 3, and also by 5.
 Hence, you will need to use two conditions.
 
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ####   Solution
 ```python
@@ -24,7 +24,7 @@ result = divisible_by_3and5(num)
 print(result)
 ```
 
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Explanation
 This one is easy. We took an input number from the user, and then pass it to a function. 
@@ -60,8 +60,8 @@ If you want to get the numbers that are either divisible by 3 or divisible by 7,
 ## Take Away
 Remainder(%) will be 0, if the number gets divided.
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](Sum-of-digits.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving` 

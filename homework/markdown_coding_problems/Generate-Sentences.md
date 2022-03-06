@@ -18,7 +18,7 @@ for i in range(len(subjects)):
        for k in range(len(objects)):
            print (subjects[i], verbs[j], objects[k])
 ```
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Explanation
 It's simple...Just run three for loops for three lists you have, each one under another. And finally, under the last one, access all three.
@@ -26,8 +26,8 @@ It's simple...Just run three for loops for three lists you have, each one under 
 Damn easy, isn't it?
 
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](../User-Submitted/Simple-Clock.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`

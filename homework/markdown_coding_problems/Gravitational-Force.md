@@ -26,7 +26,7 @@ force =(G*mass1*mass2)/(r**2)
 print("The gravitational force is:", round(force, 5),"N")
 ```
  
-**[Try it on Programming Hero](https://play.google.com/store/apps/details?id=com.learnprogramming.codecamp)**
+
 
 ## Explanation
 The calculation is simple. Only two things need to be learned from this. 
@@ -36,8 +36,8 @@ The calculation is simple. Only two things need to be learned from this.
 Also, note that while displaying the force, we used a round function. In the round function, we passed the force, the variable we want to display. Then we passed another parameter to tell, how many decimal points we want to display. 
 
 
-&nbsp;
-[![Next Page](../assets/next-button.png)](Triangle-Area.md)
-&nbsp;
+
+
+
 
 tags:  `programming-hero`  `python`  `python3`  `problem-solving`  `programming`  `coding-challenge`  `interview`  `learn-python`  `python-tutorial`  `programming-exercises`  `programming-challenges`  `programming-fundamentals`  `programming-contest`  `python-coding-challenges`  `python-problem-solving`
