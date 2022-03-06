@@ -48,6 +48,9 @@ func init() {
 				Content: fmt.Sprintf("<@%v>", i.ApplicationCommandData().TargetID),
 				Embeds:  []*discordgo.MessageEmbed{leetcodeQuestionToEmbed(questionUrl)},
 			})
+			if err != nil {
+				log.Printf("assign-homework: failed to edit interaction: %v", err)
+			}
 		},
 		"pop-quiz": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
@@ -176,6 +179,9 @@ func init() {
 						},
 					},
 				})
+				if err != nil {
+					log.Printf("show_solution: failed to respond to interaction: %v", err)
+				}
 				delete(getProblemByTitle, data.Values[0])
 				return
 			}
