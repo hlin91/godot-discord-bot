@@ -108,7 +108,7 @@ func init() {
 				return
 			}
 			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-				Content: ":alarm_clock: Getting paged! :alarm_clock:",
+				Content: ":pager: Getting paged! :pager:",
 			})
 		},
 		"stream": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
