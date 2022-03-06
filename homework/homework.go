@@ -70,7 +70,7 @@ func init() {
 			problem := createProblem(problemContent)
 			getProblemByTitle[problem.Title] = problem
 			_, err = s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-				Content: fmt.Sprintf("<@%v>\n", i.ApplicationCommandData().TargetID) + markdownProblemToMessageContent(problem),
+				Content: fmt.Sprintf("<@%v>Pop quiz!\n", i.ApplicationCommandData().TargetID) + markdownProblemToMessageContent(problem),
 				Components: []discordgo.MessageComponent{
 					discordgo.ActionsRow{
 						Components: []discordgo.MessageComponent{
@@ -84,6 +84,9 @@ func init() {
 					},
 				},
 			})
+			if err != nil {
+				log.Printf("pop-quiz: failed to edit interaction: %v", err)
+			}
 		},
 	}
 	componentHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
