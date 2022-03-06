@@ -1,7 +1,6 @@
 package voice
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/bwmarrin/discordgo"
@@ -10,6 +9,7 @@ import (
 
 var commands []*discordgo.ApplicationCommand
 var commandHandlers map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate)
+var componentHandlers map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate)
 
 var StatusLock = make(chan interface{}, 1)
 
@@ -42,6 +42,10 @@ func init() {
 		{
 			Name:        "recess",
 			Description: "Toggle a brief recess in playback",
+		},
+		{
+			Name:        "recent",
+			Description: "Stream a recently played song",
 		},
 	}
 	commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
@@ -118,7 +122,8 @@ func init() {
 				log.Printf("stream: failed to respond to interaction: %v", err)
 				return
 			}
-			info, err := UrlToEmbed(i.ApplicationCommandData().Options[0].StringValue())
+			url := i.ApplicationCommandData().Options[0].StringValue()
+			info, err := UrlToEmbed(url)
 			if err != nil {
 				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
 					Content: "Failed to retrieve video info",
@@ -128,31 +133,8 @@ func init() {
 					Embeds: []*discordgo.MessageEmbed{info},
 				})
 			}
-			go func(s *discordgo.Session, i *discordgo.InteractionCreate, url, gID string, info *discordgo.MessageEmbed) {
-				var signal interface{}
-				StatusLock <- signal
-				s.UpdateListeningStatus(info.Title)
-				defer func(s *discordgo.Session) {
-					s.UpdateListeningStatus("")
-					<-StatusLock
-				}(s)
-				err := StreamUrl(url, gID)
-				if err != nil {
-					info.Author = &discordgo.MessageEmbedAuthor{
-						Name: fmt.Sprintf("Error occurred during playback: \n%v", err),
-					}
-					s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-						Embeds: []*discordgo.MessageEmbed{info},
-					})
-					return
-				}
-				info.Author = &discordgo.MessageEmbedAuthor{
-					Name: "Finished playing",
-				}
-				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-					Embeds: []*discordgo.MessageEmbed{info},
-				})
-			}(s, i, i.ApplicationCommandData().Options[0].StringValue(), i.GuildID, info)
+			recentlyPlayed[info.Title] = url
+			go streamUrlCoroutine(s, i, url, i.GuildID, info)
 		},
 		"cease": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
@@ -173,7 +155,7 @@ func init() {
 				return
 			}
 			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-				Content: "Playback has ceased",
+				Content: "Playback has ceased for the current song",
 			})
 		},
 		"recess": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -198,10 +180,81 @@ func init() {
 				Content: "Successfully toggled pause",
 			})
 		},
+		"recent": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+			if len(recentlyPlayed) == 0 {
+				err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: "No songs have been played recently :musical_score:",
+					},
+				})
+				if err != nil {
+					log.Printf("list_solutions: failed to respond to interaction: %v", err)
+				}
+				return
+			}
+			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "",
+				},
+			})
+			if err != nil {
+				log.Printf("recent: failed to respond to interaction: %v", err)
+				return
+			}
+			selectMenuOptions := getSelectMenuOptionsFromRecentlyPlayed()
+			if len(selectMenuOptions) == 0 {
+				log.Printf("recent: warning: selectMenuOptions is empty")
+			}
+			_, err = s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+				Content: "Select a track :dvd::musical_note:",
+				Components: []discordgo.MessageComponent{
+					discordgo.ActionsRow{
+						Components: []discordgo.MessageComponent{
+							discordgo.SelectMenu{
+								CustomID:    "play_selection",
+								Placeholder: "Song title",
+								Options:     selectMenuOptions,
+							},
+						},
+					},
+				},
+			})
+			if err != nil {
+				log.Printf("list_solutions: failed to edit interaction: %v", err)
+			}
+		},
+	}
+	componentHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
+		"play_selection": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "",
+				},
+			})
+			if err != nil {
+				log.Printf("play_selection: failed to respond to interaction: %v", err)
+				return
+			}
+			url := i.MessageComponentData().Values[0]
+			info, err := UrlToEmbed(url)
+			if err != nil {
+				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+					Content: "Failed to retrieve video info",
+				})
+			} else {
+				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+					Embeds: []*discordgo.MessageEmbed{info},
+				})
+			}
+			go streamUrlCoroutine(s, i, url, i.GuildID, info)
+		},
 	}
 }
 
 // GetModule returns the command Module for voice features
 func GetModule() module.Module {
-	return module.CreateModule(commands, commandHandlers, map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){})
+	return module.CreateModule(commands, commandHandlers, componentHandlers)
 }

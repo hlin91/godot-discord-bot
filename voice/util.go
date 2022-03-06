@@ -24,12 +24,14 @@ var lock map[string]chan interface{}
 var skip map[string]chan interface{}
 var pause map[string]chan interface{}
 var signal interface{}
+var recentlyPlayed map[string]string // Maps song titles to urls
 
 func init() {
 	vc = map[string]*discordgo.VoiceConnection{}
 	lock = map[string]chan interface{}{}
 	skip = map[string]chan interface{}{}
 	pause = map[string]chan interface{}{}
+	recentlyPlayed = map[string]string{}
 }
 
 // Join the voice channel of a guild
@@ -171,4 +173,43 @@ func UrlToEmbed(url string) (*discordgo.MessageEmbed, error) {
 		},
 		Color: 0xC4302B,
 	}, nil
+}
+
+func streamUrlCoroutine(s *discordgo.Session, i *discordgo.InteractionCreate, url, gID string, info *discordgo.MessageEmbed) {
+	var signal interface{}
+	StatusLock <- signal
+	s.UpdateListeningStatus(info.Title)
+	defer func(s *discordgo.Session) {
+		s.UpdateListeningStatus("")
+		<-StatusLock
+	}(s)
+	err := StreamUrl(url, gID)
+	if err != nil {
+		info.Author = &discordgo.MessageEmbedAuthor{
+			Name: fmt.Sprintf("Error occurred during playback: \n%v", err),
+		}
+		s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+			Embeds: []*discordgo.MessageEmbed{info},
+		})
+		return
+	}
+	info.Author = &discordgo.MessageEmbedAuthor{
+		Name: "Finished playing",
+	}
+	s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+		Embeds: []*discordgo.MessageEmbed{info},
+	})
+}
+
+func getSelectMenuOptionsFromRecentlyPlayed() []discordgo.SelectMenuOption {
+	result := []discordgo.SelectMenuOption{}
+	for title, url := range recentlyPlayed {
+		result = append(result, discordgo.SelectMenuOption{
+			Label:       title,
+			Value:       url,
+			Default:     false,
+			Description: "Play this song",
+		})
+	}
+	return result
 }
