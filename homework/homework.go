@@ -81,7 +81,7 @@ func init() {
 								Label:    "Show me!",
 								Style:    discordgo.DangerButton,
 								Disabled: false,
-								CustomID: "list_solutions",
+								CustomID: "show_solution",
 							},
 						},
 					},
@@ -139,13 +139,13 @@ func init() {
 			}
 		},
 		"show_solution": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-			data := i.MessageComponentData()
-			problem, ok := getProblemByTitle[data.Values[0]]
+			title := markdownProblemMessageContentToTitle(i.Message.Content)
+			problem, ok := getProblemByTitle[title]
 			if !ok {
 				err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
-						Content: "That solution has already been shown :thinking:",
+						Content: "That solution is not available anymore :floppy_disk:",
 					},
 				})
 				if err != nil {
@@ -182,7 +182,7 @@ func init() {
 				if err != nil {
 					log.Printf("show_solution: failed to respond to interaction: %v", err)
 				}
-				delete(getProblemByTitle, data.Values[0])
+				delete(getProblemByTitle, title)
 				return
 			}
 			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
@@ -194,7 +194,7 @@ func init() {
 			if err != nil {
 				log.Printf("show_solution: failed to respond to interaction: %v", err)
 			}
-			delete(getProblemByTitle, data.Values[0])
+			delete(getProblemByTitle, title)
 		},
 	}
 }

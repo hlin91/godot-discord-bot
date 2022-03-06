@@ -68,6 +68,11 @@ func markdownProblemToMessageContent(p *problem) string {
 	return fmt.Sprintf("**%s**\n\n%s", strings.TrimSpace(p.Title), p.Body)
 }
 
+// Fetch extract the title from markdown problem message content
+func markdownProblemMessageContentToTitle(content string) string {
+	return strings.Trim(strings.Split(content, "\n")[2], "*")
+}
+
 // Construct a discord SelectMenu from the current cached problems
 func getSelectMenuOptionsFromCachedProblems() []discordgo.SelectMenuOption {
 	result := []discordgo.SelectMenuOption{}
