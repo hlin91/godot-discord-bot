@@ -48,12 +48,12 @@ func init() {
 		parentFilter := rss.ParentNodeFilterFunc(rss.FilterByClass("sh_fc2blogheadbar_body"))
 		nodeFilter := rss.DefaultFilterStrategy()
 		return parentFilter(n) && nodeFilter(n)
-	}, rss.DefaultExtractionStrategy(), rss.DefaultTransformStrategy(), 1)
+	}, rss.DefaultExtractionStrategy(), rss.DefaultTransformStrategy(), getChannelId, 1)
 	rss.AddFeed(`http://2chav.com/?xml`, func(n *html.Node) bool {
 		parentFilter := rss.ParentNodeFilterFunc(rss.FilterByClass("kobetu_kiji"))
 		nodeFilter := rss.DefaultFilterStrategy()
 		return parentFilter(n) && nodeFilter(n)
-	}, rss.DefaultFilterStrategy(), rss.DefaultExtractionStrategy(), rss.DefaultTransformStrategy(), 1)
+	}, rss.DefaultFilterStrategy(), rss.DefaultExtractionStrategy(), rss.DefaultTransformStrategy(), getChannelId, 1)
 	rss.AddFeed(`https://dlsite-rss.s3-ap-northeast-1.amazonaws.com/voice_rss.xml`, rss.FilterByAttr("property", "og:image"), func(n *html.Node) bool {
 		parentFilter := rss.ParentNodeFilterFunc(rss.FilterByClass("logo"))
 		nodeFilter := rss.DefaultFilterStrategy()
@@ -63,7 +63,7 @@ func init() {
 			return `https://www.dlsite.com` + s
 		}
 		return s
-	}, 1)
+	}, getSecondChannelId, 1)
 }
 
 func main() {
@@ -83,7 +83,7 @@ func main() {
 	session.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
 		log.Println("starting rss listener...")
 		tick := time.NewTicker(WAIT_TIME)
-		go rss.ListenerProcess(s, getChannelID(), tick, done, ret)
+		go rss.ListenerProcess(s, tick, done, ret)
 	})
 
 	// Calls the corresponding handler for a command

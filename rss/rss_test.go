@@ -18,12 +18,12 @@ func TestRssFeeds(t *testing.T) {
 		parentFilter := ParentNodeFilterFunc(FilterByClass("sh_fc2blogheadbar_body"))
 		nodeFilter := DefaultFilterStrategy()
 		return parentFilter(n) && nodeFilter(n)
-	}, DefaultExtractionStrategy(), DefaultTransformStrategy(), 1)
+	}, DefaultExtractionStrategy(), DefaultTransformStrategy(), func() string { return "" }, 1)
 	AddFeed(`http://2chav.com/?xml`, func(n *html.Node) bool {
 		parentFilter := ParentNodeFilterFunc(FilterByClass("kobetu_kiji"))
 		nodeFilter := DefaultFilterStrategy()
 		return parentFilter(n) && nodeFilter(n)
-	}, DefaultFilterStrategy(), DefaultExtractionStrategy(), DefaultTransformStrategy(), 1)
+	}, DefaultFilterStrategy(), DefaultExtractionStrategy(), DefaultTransformStrategy(), func() string { return "" }, 1)
 	AddFeed(`https://dlsite-rss.s3-ap-northeast-1.amazonaws.com/voice_rss.xml`, FilterByAttr("property", "og:image"), func(n *html.Node) bool {
 		parentFilter := ParentNodeFilterFunc(FilterByClass("logo"))
 		nodeFilter := DefaultFilterStrategy()
@@ -33,7 +33,7 @@ func TestRssFeeds(t *testing.T) {
 			return `https://www.dlsite.com` + s
 		}
 		return s
-	}, 1)
+	}, func() string { return "" }, 1)
 
 	items := GetLatest()
 	var item *gofeed.Item

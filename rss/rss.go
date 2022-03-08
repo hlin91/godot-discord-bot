@@ -24,18 +24,19 @@ type Feed struct {
 	LogoImageNodeFilterStrategy *func(*html.Node) bool
 	ImageLinkExtractionStrategy *func(*html.Node) string
 	ImageLinkTransformStrategy  *func(string) string
+	GetChannelIdStrategy        *func() string
 }
 
-var feeds []Feed                 // List of feeds to parse
-var seen map[Feed][]*gofeed.Item // Remember the items we have already seen
+var feeds []*Feed                 // List of feeds to parse
+var seen map[*Feed][]*gofeed.Item // Remember the items we have already seen
 var parser *gofeed.Parser
 
 var commands []*discordgo.ApplicationCommand
 var commandHandlers map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate)
 
 func init() {
-	feeds = []Feed{}
-	seen = map[Feed][]*gofeed.Item{}
+	feeds = []*Feed{}
+	seen = map[*Feed][]*gofeed.Item{}
 	parser = gofeed.NewParser()
 	commands = []*discordgo.ApplicationCommand{
 		{
@@ -58,8 +59,8 @@ func init() {
 			// Do RSS stuff here
 			ClearHistory()
 			items := GetLatest()
-			images := []string{}
-			logos := []string{}
+			var images []string
+			var logos []string
 			embeds := []*discordgo.MessageEmbed{}
 			for key, val := range items {
 				images, _ = GetImages(val[0].Link, *key.ImageNodeFilterStrategy, key.NumImages, *key.ImageLinkExtractionStrategy, *key.ImageLinkTransformStrategy)
@@ -89,20 +90,21 @@ func ClearHistory() {
 }
 
 // AddFeed adds a url to the list of feeds to parse
-func AddFeed(url string, imageNodeFilterStrategy func(*html.Node) bool, logoImageNodeFilterStrategy func(*html.Node) bool, imageLinkExtractionStrategy func(*html.Node) string, imageLinkTransformStrategy func(string) string, n int) {
-	feeds = append(feeds, Feed{
+func AddFeed(url string, imageNodeFilterStrategy func(*html.Node) bool, logoImageNodeFilterStrategy func(*html.Node) bool, imageLinkExtractionStrategy func(*html.Node) string, imageLinkTransformStrategy func(string) string, getChannelIdStrategy func() string, n int) {
+	feeds = append(feeds, &Feed{
 		Url:                         url,
 		ImageNodeFilterStrategy:     &imageNodeFilterStrategy,
 		LogoImageNodeFilterStrategy: &logoImageNodeFilterStrategy,
 		ImageLinkExtractionStrategy: &imageLinkExtractionStrategy,
 		ImageLinkTransformStrategy:  &imageLinkTransformStrategy,
 		NumImages:                   n,
+		GetChannelIdStrategy:        &getChannelIdStrategy,
 	})
 }
 
 // GetLatest gets the latest items, up to MAX_ITEMS, that have not been seen during its last call
-func GetLatest() map[Feed][]*gofeed.Item {
-	result := map[Feed][]*gofeed.Item{}
+func GetLatest() map[*Feed][]*gofeed.Item {
+	result := map[*Feed][]*gofeed.Item{}
 	for _, f := range feeds {
 		feed, err := parser.ParseURL(f.Url)
 		if err != nil {
@@ -162,7 +164,6 @@ func GetImages(url string, filterStrategy func(*html.Node) bool, maxLinks int, e
 	// Extract images by using the provided filter, extraction, and transform strategy
 	nodes := []*html.Node{}
 	nodes = getNodesByFunc(doc, filterStrategy, nodes)
-	result = []string{}
 	for _, n := range nodes {
 		link := extractionStrategy(n)
 		if len(link) > 0 && len(result) < maxLinks {
