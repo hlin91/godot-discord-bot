@@ -37,7 +37,7 @@ func init() {
 // Join the voice channel of a guild
 func JoinVoice(s *discordgo.Session, guildID, channelID string) error {
 	voice, err := s.ChannelVoiceJoin(guildID, channelID, false, true)
-	if err != nil || vc == nil {
+	if err != nil || vc[guildID] == nil {
 		return fmt.Errorf("failed to join voice channel %v: %v", channelID, err)
 	}
 	vc[guildID] = voice
@@ -47,7 +47,7 @@ func JoinVoice(s *discordgo.Session, guildID, channelID string) error {
 
 // Disconnect from the voice channel of a guild
 func LeaveVoice(guildID string) error {
-	if vc == nil {
+	if vc[guildID] == nil {
 		return fmt.Errorf("tried to disconnect from nil voice channel")
 	}
 	err := vc[guildID].Disconnect()
