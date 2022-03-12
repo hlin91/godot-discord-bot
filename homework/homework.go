@@ -2,10 +2,8 @@ package homework
 
 import (
 	"fmt"
-	"io/fs"
-	"io/ioutil"
 	"log"
-	"os"
+	"sort"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/harvlin/godot/module"
@@ -14,6 +12,7 @@ import (
 var commands []*discordgo.ApplicationCommand
 var commandHandlers map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate)
 var componentHandlers map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate)
+var modalHandlers map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate)
 
 func init() {
 	commands = []*discordgo.ApplicationCommand{
@@ -93,49 +92,32 @@ func init() {
 		},
 	}
 	componentHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
-		"list_solutions": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-			if len(getProblemByInteractionId) == 0 {
-				err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-					Type: discordgo.InteractionResponseChannelMessageWithSource,
-					Data: &discordgo.InteractionResponseData{
-						Content: "Sorry, I have no more solutions to show :pensive:",
-					},
-				})
-				if err != nil {
-					log.Printf("list_solutions: failed to respond to interaction: %v", err)
-				}
-				return
-			}
+		"search_solutions": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+				Type: discordgo.InteractionResponseModal,
 				Data: &discordgo.InteractionResponseData{
-					Content: "",
-				},
-			})
-			if err != nil {
-				log.Printf("list_solutions: failed to respond to interaction: %v", err)
-				return
-			}
-			selectMenuOptions := getSelectMenuOptionsFromCachedProblems()
-			if len(selectMenuOptions) == 0 {
-				log.Printf("list_solutions: warning: selectMenuOptions is empty")
-			}
-			_, err = s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
-				Content: "Which solution do you want to see?",
-				Components: []discordgo.MessageComponent{
-					discordgo.ActionsRow{
-						Components: []discordgo.MessageComponent{
-							discordgo.SelectMenu{
-								CustomID:    "show_solution",
-								Placeholder: "Choose a solution",
-								Options:     selectMenuOptions,
+					Content:  "Which solution would you like to see? :mag:",
+					CustomID: "search_solution",
+					Title:    "Solution searcher",
+					Components: []discordgo.MessageComponent{
+						discordgo.ActionsRow{
+							Components: []discordgo.MessageComponent{
+								discordgo.TextInput{
+									CustomID:    "search_solution",
+									Placeholder: "Enter solution title here...",
+									Label:       "Search for a solution by title",
+									Style:       discordgo.TextInputShort,
+									Required:    true,
+									MinLength:   1,
+									MaxLength:   500,
+								},
 							},
 						},
 					},
 				},
 			})
 			if err != nil {
-				log.Printf("list_solutions: failed to edit interaction: %v", err)
+				log.Printf("search_solutions: failed to respond to interaction: %v", err)
 			}
 		},
 		"show_solution": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -144,7 +126,19 @@ func init() {
 				err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
-						Content: "That solution is not available anymore :floppy_disk:",
+						Content: "That solution is not available anymore :floppy_disk: Would you like to look it up? :mag:",
+						Components: []discordgo.MessageComponent{
+							discordgo.ActionsRow{
+								Components: []discordgo.MessageComponent{
+									discordgo.Button{
+										Label:    "Yes",
+										Style:    discordgo.SuccessButton,
+										Disabled: false,
+										CustomID: "search_solutions",
+									},
+								},
+							},
+						},
 					},
 				})
 				if err != nil {
@@ -152,52 +146,48 @@ func init() {
 				}
 				return
 			}
-			solution := problem.Solution
-			if len(solution) > 2000 {
-				// Solution is over 2000 chars so we have to upload it as a file
-				err := ioutil.WriteFile(TMP_SOLUTION_FILE, []byte(solution), fs.ModePerm)
-				if err != nil {
-					log.Printf("show_solution: failed to write file %v: %v", TMP_SOLUTION_FILE, err)
-					return
-				}
-				file, err := os.Open(TMP_SOLUTION_FILE)
-				if err != nil {
-					log.Printf("show_solution: failed to open file %v: %v", TMP_SOLUTION_FILE, err)
-					return
-				}
-				err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-					Type: discordgo.InteractionResponseChannelMessageWithSource,
-					Data: &discordgo.InteractionResponseData{
-						Content: "This solution is too large. Uploading as a file :file_folder:",
-						Files: []*discordgo.File{
-							{
-								Name:        "solution.md",
-								ContentType: "multipart/form-data",
-								Reader:      file,
-							},
-						},
-					},
-				})
-				if err != nil {
-					log.Printf("show_solution: failed to respond to interaction: %v", err)
-				}
-				delete(getProblemByInteractionId, i.Message.Interaction.ID)
-				return
-			}
+			showSolutionHelp(problem, s, i)
+			// delete(getProblemByInteractionId, i.Message.Interaction.ID)
+		},
+	}
+	modalHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
+		"search_solution": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: solution,
+					Content: "Looking up solution... :mag:",
 				},
 			})
 			if err != nil {
-				log.Printf("show_solution: failed to respond to interaction: %v", err)
+				log.Printf("hard_lookup_solution: failed to respond to interaction: %v", err)
 			}
-			delete(getProblemByInteractionId, i.Message.Interaction.ID)
+			problemBank, err := getAllProblemsSingleton()
+			if err != nil {
+				log.Printf("hard_lookup_solution: failed to retrieve singleton: %v", err)
+			}
+			input := i.ModalSubmitData().Components[0].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value
+			keys := []string{}
+			for k := range problemBank {
+				keys = append(keys, k)
+			}
+			sort.Slice(keys, func(i, j int) bool {
+				return editDistance(keys[i], input) < editDistance(keys[j], input)
+			})
+			response, err := solutionToResponseData(problemBank[keys[0]])
+			if err != nil {
+				log.Printf("hard_lookup_solution: failed to generate response: %v", err)
+			}
+			_, err = s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+				Content: response.Content,
+				Files:   response.Files,
+			})
+			if err != nil {
+				log.Printf("hard_lookup_solution: failed to edit response: %v", err)
+			}
 		},
 	}
 }
 
 func GetModule() module.Module {
-	return module.CreateModule(commands, commandHandlers, componentHandlers)
+	return module.CreateModule(commands, commandHandlers, componentHandlers, modalHandlers)
 }

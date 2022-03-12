@@ -256,5 +256,5 @@ func init() {
 
 // GetModule returns the command Module for voice features
 func GetModule() module.Module {
-	return module.CreateModule(commands, commandHandlers, componentHandlers)
+	return module.CreateModule(commands, commandHandlers, componentHandlers, map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){})
 }

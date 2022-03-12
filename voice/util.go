@@ -211,5 +211,8 @@ func getSelectMenuOptionsFromRecentlyPlayed() []discordgo.SelectMenuOption {
 			Description: "Play this song",
 		})
 	}
+	if len(result) > 25 {
+		result = result[:25]
+	}
 	return result
 }

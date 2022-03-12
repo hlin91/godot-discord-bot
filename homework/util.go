@@ -3,9 +3,11 @@ package homework
 import (
 	"fmt"
 	"log"
+	"math"
 	"math/rand"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/andybalholm/cascadia"
@@ -199,16 +201,36 @@ func rosettaGetRandomQuestion() (string, error) {
 	return ROSETTA_PAGE_ROOT + randomProblem, nil
 }
 
-// Construct a discord message embed from a problem link
-func popQuizQuestionToEmbed(url string) *discordgo.MessageEmbed {
-	return &discordgo.MessageEmbed{
-		URL:         url,
-		Type:        discordgo.EmbedTypeArticle,
-		Title:       ":alarm_clock: Pop Quiz :alarm_clock:",
-		Description: "Due right now!",
-		Thumbnail: &discordgo.MessageEmbedThumbnail{
-			URL: POP_QUIZ_ICON_URL,
-		},
-		Color: 0x1DA1F2,
+// Calculate the edit distance between 2 strings
+func editDistance(s1, s2 string) int {
+	if len(s1) == 0 {
+		return len(s2)
 	}
+	if len(s2) == 0 {
+		return len(s1)
+	}
+	s1 = strings.ToLower(s1)
+	s2 = strings.ToLower(s2)
+	dp := [][]int{}
+	for i := 0; i <= len(s1); i++ {
+		dp = append(dp, make([]int, len(s2)+1))
+	}
+	for i := range dp {
+		for j := range dp[i] {
+			if i == 0 {
+				dp[i][j] = j
+				continue
+			}
+			if j == 0 {
+				dp[i][j] = i
+				continue
+			}
+			cost := 1
+			if s1[i-1] == s2[j-1] {
+				cost = 0
+			}
+			dp[i][j] = int(math.Min(math.Min(float64(dp[i-1][j]+1), float64(dp[i][j-1]+1)), float64(dp[i-1][j-1]+cost)))
+		}
+	}
+	return dp[len(s1)-1][len(s2)-1]
 }

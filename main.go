@@ -30,6 +30,7 @@ var (
 var modules = []module.Module{}
 var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){}
 var componentHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){}
+var modalHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){}
 
 func init() {
 	flag.Parse()
@@ -106,6 +107,10 @@ func main() {
 			if h, ok := componentHandlers[i.MessageComponentData().CustomID]; ok {
 				h(s, i)
 			}
+		case discordgo.InteractionModalSubmit:
+			if h, ok := modalHandlers[i.ModalSubmitData().CustomID]; ok {
+				h(s, i)
+			}
 		}
 	})
 
@@ -118,7 +123,7 @@ func main() {
 	log.Printf("loading handlers...")
 	// Load command modules
 	for _, m := range modules {
-		m.Load(session, commandHandlers, componentHandlers, *registerCommands)
+		m.Load(session, commandHandlers, componentHandlers, modalHandlers, *registerCommands)
 	}
 	log.Printf("bot is ready")
 	stop := make(chan os.Signal, 1)
