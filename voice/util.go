@@ -201,12 +201,12 @@ func streamUrlCoroutine(s *discordgo.Session, i *discordgo.InteractionCreate, ur
 	})
 }
 
-func getSelectMenuOptionsFromRecentlyPlayed() []discordgo.SelectMenuOption {
+func getSelectMenuOptionsFromMap(m map[string]string) []discordgo.SelectMenuOption {
 	result := []discordgo.SelectMenuOption{}
-	for title, url := range recentlyPlayed {
+	for key, val := range m {
 		result = append(result, discordgo.SelectMenuOption{
-			Label:       title,
-			Value:       url,
+			Label:       key,
+			Value:       val,
 			Default:     false,
 			Description: "Play this song",
 		})
@@ -215,4 +215,8 @@ func getSelectMenuOptionsFromRecentlyPlayed() []discordgo.SelectMenuOption {
 		result = result[:25]
 	}
 	return result
+}
+
+func getSelectMenuOptionsFromRecentlyPlayed() []discordgo.SelectMenuOption {
+	return getSelectMenuOptionsFromMap(recentlyPlayed)
 }
