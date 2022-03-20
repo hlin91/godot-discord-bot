@@ -37,7 +37,7 @@ func init() {
 // Join the voice channel of a guild
 func JoinVoice(s *discordgo.Session, guildID, channelID string) error {
 	voice, err := s.ChannelVoiceJoin(guildID, channelID, false, true)
-	if err != nil || vc[guildID] == nil {
+	if err != nil || voice == nil {
 		return fmt.Errorf("failed to join voice channel %v: %v", channelID, err)
 	}
 	vc[guildID] = voice
