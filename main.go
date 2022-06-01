@@ -65,6 +65,15 @@ func init() {
 		}
 		return s
 	}, getSecondChannelId, 1)
+	rss.AddFeed(`http://avohayo.blog.fc2.com/?xml`, func(n *html.Node) bool {
+		parentFilter := rss.ParentNodeFilterFunc(rss.FilterByClass("entry_body"))
+		nodeFilter := rss.DefaultFilterStrategy()
+		return parentFilter(n) && nodeFilter(n)
+	}, func(n *html.Node) bool {
+		parentFilter := rss.ParentNodeFilterFunc(rss.FilterByAttr("id", "sh_fc2blogheadbar_menu"))
+		nodeFilter := rss.DefaultFilterStrategy()
+		return parentFilter(n) && nodeFilter(n)
+	}, rss.DefaultExtractionStrategy(), rss.DefaultTransformStrategy(), getChannelId, 1)
 }
 
 func main() {

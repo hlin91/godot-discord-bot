@@ -10,6 +10,20 @@ import (
 	"golang.org/x/net/html"
 )
 
+var presetCookies []*http.Cookie
+
+func init() {
+	presetCookies = append(presetCookies, &http.Cookie{
+		Name: "age_check",
+		Value: "1",
+		Path: "/",
+		Domain: `blog.fc2.com`,
+		HttpOnly: true,
+		Secure: false,
+		MaxAge: 0,
+	})
+}
+
 // Element attributes that are known to contain image links
 var isImageAttr map[string]bool = map[string]bool{
 	"href":     true,
@@ -33,7 +47,7 @@ func (p *myJar) SetCookies(u *url.URL, cookies []*http.Cookie) {
 func (p *myJar) Cookies(u *url.URL) []*http.Cookie {
 	log.Printf("The URL is : %s\n", u.String())
 	log.Printf("Cookie being returned is : %s\n", p.jar[u.Host])
-	return p.jar[u.Host]
+	return append(p.jar[u.Host], presetCookies...)
 }
 
 func getImageFormats() []string {

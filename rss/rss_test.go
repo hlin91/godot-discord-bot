@@ -34,6 +34,15 @@ func TestRssFeeds(t *testing.T) {
 		}
 		return s
 	}, func() string { return "" }, 1)
+	AddFeed(`http://avohayo.blog.fc2.com/?xml`, func(n *html.Node) bool {
+		parentFilter := ParentNodeFilterFunc(FilterByClass("entry_body"))
+		nodeFilter := DefaultFilterStrategy()
+		return parentFilter(n) && nodeFilter(n)
+	}, func(n *html.Node) bool {
+		parentFilter := ParentNodeFilterFunc(FilterByAttr("id", "sh_fc2blogheadbar_menu"))
+		nodeFilter := DefaultFilterStrategy()
+		return parentFilter(n) && nodeFilter(n)
+	}, DefaultExtractionStrategy(), DefaultTransformStrategy(), func() string { return "" }, 1)
 
 	items := GetLatest()
 	var item *gofeed.Item
