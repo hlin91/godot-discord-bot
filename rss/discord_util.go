@@ -8,7 +8,7 @@ import (
 	"github.com/mmcdole/gofeed"
 )
 
-// ItemToEmbed creates an embed from a function
+// ItemToEmbed creates an embed from an Item
 func ItemToEmbed(item *gofeed.Item, images []string, logos []string) *discordgo.MessageEmbed {
 	if len(logos) == 0 {
 		logos = append(logos, "")

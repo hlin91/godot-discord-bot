@@ -41,7 +41,7 @@ func init() {
 }
 
 func init() {
-	rss.AddFeed(`http://fiu758.blog111.fc2.com/?xml`, func(n *html.Node) bool {
+	rss.AddFeed(rss.NewRssFeed(`http://fiu758.blog111.fc2.com/?xml`), func(n *html.Node) bool {
 		parentFilter := rss.ParentNodeFilterFunc(rss.FilterByClass("main_txt"))
 		nodeFilter := rss.DefaultFilterStrategy()
 		return parentFilter(n) && nodeFilter(n)
@@ -50,12 +50,12 @@ func init() {
 		nodeFilter := rss.DefaultFilterStrategy()
 		return parentFilter(n) && nodeFilter(n)
 	}, rss.DefaultExtractionStrategy(), rss.DefaultTransformStrategy(), getChannelId, 1)
-	rss.AddFeed(`http://2chav.com/?xml`, func(n *html.Node) bool {
+	rss.AddFeed(rss.NewRssFeed(`http://2chav.com/?xml`), func(n *html.Node) bool {
 		parentFilter := rss.ParentNodeFilterFunc(rss.FilterByClass("kobetu_kiji"))
 		nodeFilter := rss.DefaultFilterStrategy()
 		return parentFilter(n) && nodeFilter(n)
 	}, rss.DefaultFilterStrategy(), rss.DefaultExtractionStrategy(), rss.DefaultTransformStrategy(), getChannelId, 1)
-	rss.AddFeed(`https://dlsite-rss.s3-ap-northeast-1.amazonaws.com/voice_rss.xml`, rss.FilterByAttr("property", "og:image"), func(n *html.Node) bool {
+	rss.AddFeed(rss.NewRssFeed(`https://dlsite-rss.s3-ap-northeast-1.amazonaws.com/voice_rss.xml`), rss.FilterByAttr("property", "og:image"), func(n *html.Node) bool {
 		parentFilter := rss.ParentNodeFilterFunc(rss.FilterByClass("logo"))
 		nodeFilter := rss.DefaultFilterStrategy()
 		return parentFilter(n) && nodeFilter(n)
@@ -65,7 +65,7 @@ func init() {
 		}
 		return s
 	}, getSecondChannelId, 1)
-	rss.AddFeed(`http://avohayo.blog.fc2.com/?xml`, func(n *html.Node) bool {
+	rss.AddFeed(rss.NewRssFeed(`http://avohayo.blog.fc2.com/?xml`), func(n *html.Node) bool {
 		parentFilter := rss.ParentNodeFilterFunc(rss.FilterByClass("entry_body"))
 		nodeFilter := rss.DefaultFilterStrategy()
 		return parentFilter(n) && nodeFilter(n)

@@ -18,7 +18,7 @@ const (
 )
 
 type Feed struct {
-	Url                         string
+	ItemProvider                ItemProvider
 	NumImages                   int
 	ImageNodeFilterStrategy     *func(*html.Node) bool
 	LogoImageNodeFilterStrategy *func(*html.Node) bool
@@ -90,9 +90,9 @@ func ClearHistory() {
 }
 
 // AddFeed adds a url to the list of feeds to parse
-func AddFeed(url string, imageNodeFilterStrategy func(*html.Node) bool, logoImageNodeFilterStrategy func(*html.Node) bool, imageLinkExtractionStrategy func(*html.Node) string, imageLinkTransformStrategy func(string) string, getChannelIdStrategy func() string, n int) {
+func AddFeed(itemProvider ItemProvider, imageNodeFilterStrategy func(*html.Node) bool, logoImageNodeFilterStrategy func(*html.Node) bool, imageLinkExtractionStrategy func(*html.Node) string, imageLinkTransformStrategy func(string) string, getChannelIdStrategy func() string, n int) {
 	feeds = append(feeds, &Feed{
-		Url:                         url,
+		ItemProvider:                itemProvider,
 		ImageNodeFilterStrategy:     &imageNodeFilterStrategy,
 		LogoImageNodeFilterStrategy: &logoImageNodeFilterStrategy,
 		ImageLinkExtractionStrategy: &imageLinkExtractionStrategy,
@@ -106,12 +106,7 @@ func AddFeed(url string, imageNodeFilterStrategy func(*html.Node) bool, logoImag
 func GetLatest() map[*Feed][]*gofeed.Item {
 	result := map[*Feed][]*gofeed.Item{}
 	for _, f := range feeds {
-		feed, err := parser.ParseURL(f.Url)
-		if err != nil {
-			log.Print(err)
-			continue
-		}
-		items := feed.Items
+		items := f.ItemProvider.items()
 		if len(items) > MAX_ITEMS {
 			items = items[:MAX_ITEMS]
 		}

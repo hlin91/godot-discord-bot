@@ -10,7 +10,7 @@ import (
 )
 
 func TestRssFeeds(t *testing.T) {
-	AddFeed(`http://fiu758.blog111.fc2.com/?xml`, func(n *html.Node) bool {
+	AddFeed(NewRssFeed(`http://fiu758.blog111.fc2.com/?xml`), func(n *html.Node) bool {
 		parentFilter := ParentNodeFilterFunc(FilterByClass("main_txt"))
 		nodeFilter := DefaultFilterStrategy()
 		return parentFilter(n) && nodeFilter(n)
@@ -19,12 +19,12 @@ func TestRssFeeds(t *testing.T) {
 		nodeFilter := DefaultFilterStrategy()
 		return parentFilter(n) && nodeFilter(n)
 	}, DefaultExtractionStrategy(), DefaultTransformStrategy(), func() string { return "" }, 1)
-	AddFeed(`http://2chav.com/?xml`, func(n *html.Node) bool {
+	AddFeed(NewRssFeed(`http://2chav.com/?xml`), func(n *html.Node) bool {
 		parentFilter := ParentNodeFilterFunc(FilterByClass("kobetu_kiji"))
 		nodeFilter := DefaultFilterStrategy()
 		return parentFilter(n) && nodeFilter(n)
 	}, DefaultFilterStrategy(), DefaultExtractionStrategy(), DefaultTransformStrategy(), func() string { return "" }, 1)
-	AddFeed(`https://dlsite-rss.s3-ap-northeast-1.amazonaws.com/voice_rss.xml`, FilterByAttr("property", "og:image"), func(n *html.Node) bool {
+	AddFeed(NewRssFeed(`https://dlsite-rss.s3-ap-northeast-1.amazonaws.com/voice_rss.xml`), FilterByAttr("property", "og:image"), func(n *html.Node) bool {
 		parentFilter := ParentNodeFilterFunc(FilterByClass("logo"))
 		nodeFilter := DefaultFilterStrategy()
 		return parentFilter(n) && nodeFilter(n)
@@ -34,7 +34,7 @@ func TestRssFeeds(t *testing.T) {
 		}
 		return s
 	}, func() string { return "" }, 1)
-	AddFeed(`http://avohayo.blog.fc2.com/?xml`, func(n *html.Node) bool {
+	AddFeed(NewRssFeed(`http://avohayo.blog.fc2.com/?xml`), func(n *html.Node) bool {
 		parentFilter := ParentNodeFilterFunc(FilterByClass("entry_body"))
 		nodeFilter := DefaultFilterStrategy()
 		return parentFilter(n) && nodeFilter(n)
