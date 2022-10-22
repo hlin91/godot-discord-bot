@@ -14,24 +14,14 @@ var presetCookies []*http.Cookie
 
 func init() {
 	presetCookies = append(presetCookies, &http.Cookie{
-		Name: "age_check",
-		Value: "1",
-		Path: "/",
-		Domain: `blog.fc2.com`,
+		Name:     "age_check",
+		Value:    "1",
+		Path:     "/",
+		Domain:   `blog.fc2.com`,
 		HttpOnly: true,
-		Secure: false,
-		MaxAge: 0,
+		Secure:   false,
+		MaxAge:   0,
 	})
-}
-
-// Element attributes that are known to contain image links
-var isImageAttr map[string]bool = map[string]bool{
-	"href":     true,
-	"src":      true,
-	"url":      true,
-	"srcset":   true,
-	"data-src": true,
-	"content":  true,
 }
 
 type myJar struct {
@@ -50,12 +40,8 @@ func (p *myJar) Cookies(u *url.URL) []*http.Cookie {
 	return append(p.jar[u.Host], presetCookies...)
 }
 
-func getImageFormats() []string {
-	return []string{".jpg", ".png", ".jpeg"}
-}
-
 func isImageFormat(s string) bool {
-	formats := getImageFormats()
+	formats := []string{".jpg", ".png", ".jpeg"}
 	for _, fmt := range formats {
 		if strings.HasSuffix(s, fmt) {
 			return true
@@ -65,6 +51,15 @@ func isImageFormat(s string) bool {
 }
 
 func isImageAttribute(s string) bool {
+	// Element attributes that are known to contain image links
+	var isImageAttr map[string]bool = map[string]bool{
+		"href":     true,
+		"src":      true,
+		"url":      true,
+		"srcset":   true,
+		"data-src": true,
+		"content":  true,
+	}
 	return isImageAttr[s]
 }
 
@@ -87,7 +82,7 @@ func getImagesHelp(node *html.Node, dataType string, linksFound []string, n int)
 	}
 	if node.Type == html.ElementNode && node.Data == dataType {
 		for _, a := range node.Attr {
-			if isImageAttr[a.Key] && isImageFormat(a.Val) && len(linksFound) < n {
+			if isImageAttribute(a.Key) && isImageFormat(a.Val) && len(linksFound) < n {
 				linksFound = append(linksFound, a.Val)
 			}
 		}

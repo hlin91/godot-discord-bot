@@ -2,6 +2,7 @@ package rss
 
 import (
 	"log"
+
 	"github.com/mmcdole/gofeed"
 )
 
@@ -10,8 +11,8 @@ type RssFeed struct {
 	Url string
 }
 
-func NewRssFeed(url string) *RssFeed {
-	result := RssFeed{
+func NewRssFeed(url string) *ItemProvider {
+	var result ItemProvider = RssFeed{
 		Url: url,
 	}
 	return &result
@@ -20,7 +21,7 @@ func NewRssFeed(url string) *RssFeed {
 func (r RssFeed) items() []*gofeed.Item {
 	feed, err := parser.ParseURL(r.Url)
 	if err != nil {
-		log.Printf("RssFeed.items: failed to parse url '%v'", r.Url)
+		log.Printf("RssFeed.items: failed to parse url '%v': '%v'", r.Url, err)
 		return []*gofeed.Item{}
 	}
 	return feed.Items

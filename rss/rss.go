@@ -18,7 +18,7 @@ const (
 )
 
 type Feed struct {
-	ItemProvider                ItemProvider
+	ItemProvider                *ItemProvider
 	NumImages                   int
 	ImageNodeFilterStrategy     *func(*html.Node) bool
 	LogoImageNodeFilterStrategy *func(*html.Node) bool
@@ -38,6 +38,7 @@ func init() {
 	feeds = []*Feed{}
 	seen = map[*Feed][]*gofeed.Item{}
 	parser = gofeed.NewParser()
+	parser.UserAgent = `Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:97.0) Gecko/20100101 Firefox/97.0`
 	commands = []*discordgo.ApplicationCommand{
 		{
 			Name:        "test_rss",
@@ -67,7 +68,7 @@ func init() {
 				logos, _ = GetImages(val[0].Link, *key.LogoImageNodeFilterStrategy, key.NumImages, *key.ImageLinkExtractionStrategy, *key.ImageLinkTransformStrategy)
 				embeds = append(embeds, ItemToEmbed(val[0], images, logos))
 			}
-			_, err = s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+			_, err = s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 				Embeds: embeds,
 			})
 			if err != nil {
@@ -89,24 +90,17 @@ func ClearHistory() {
 	}
 }
 
-// AddFeed adds a url to the list of feeds to parse
-func AddFeed(itemProvider ItemProvider, imageNodeFilterStrategy func(*html.Node) bool, logoImageNodeFilterStrategy func(*html.Node) bool, imageLinkExtractionStrategy func(*html.Node) string, imageLinkTransformStrategy func(string) string, getChannelIdStrategy func() string, n int) {
-	feeds = append(feeds, &Feed{
-		ItemProvider:                itemProvider,
-		ImageNodeFilterStrategy:     &imageNodeFilterStrategy,
-		LogoImageNodeFilterStrategy: &logoImageNodeFilterStrategy,
-		ImageLinkExtractionStrategy: &imageLinkExtractionStrategy,
-		ImageLinkTransformStrategy:  &imageLinkTransformStrategy,
-		NumImages:                   n,
-		GetChannelIdStrategy:        &getChannelIdStrategy,
-	})
+// AddFeed adds a feed to the list of feeds to parse
+func AddFeed(feed *Feed) {
+	feeds = append(feeds, feed)
 }
 
 // GetLatest gets the latest items, up to MAX_ITEMS, that have not been seen during its last call
 func GetLatest() map[*Feed][]*gofeed.Item {
 	result := map[*Feed][]*gofeed.Item{}
 	for _, f := range feeds {
-		items := f.ItemProvider.items()
+		provider := *f.ItemProvider
+		items := provider.items()
 		if len(items) > MAX_ITEMS {
 			items = items[:MAX_ITEMS]
 		}

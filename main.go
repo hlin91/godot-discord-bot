@@ -41,39 +41,42 @@ func init() {
 }
 
 func init() {
-	rss.AddFeed(rss.NewRssFeed(`http://fiu758.blog111.fc2.com/?xml`), func(n *html.Node) bool {
+	rss.AddFeed(rss.NewFeedBuilder().WithItemProvider(rss.NewRssFeed(`http://fiu758.blog111.fc2.com/?xml`)).WithImageNodeFilterStrategy(func(n *html.Node) bool {
 		parentFilter := rss.ParentNodeFilterFunc(rss.FilterByClass("main_txt"))
 		nodeFilter := rss.DefaultFilterStrategy()
 		return parentFilter(n) && nodeFilter(n)
-	}, func(n *html.Node) bool {
+	}).WithLogoImageNodeFilterStrategy(func(n *html.Node) bool {
 		parentFilter := rss.ParentNodeFilterFunc(rss.FilterByClass("sh_fc2blogheadbar_body"))
 		nodeFilter := rss.DefaultFilterStrategy()
 		return parentFilter(n) && nodeFilter(n)
-	}, rss.DefaultExtractionStrategy(), rss.DefaultTransformStrategy(), getChannelId, 1)
-	rss.AddFeed(rss.NewRssFeed(`http://2chav.com/?xml`), func(n *html.Node) bool {
+	}).WithGetChannelIdStrategy(getChannelId).Build())
+
+	rss.AddFeed(rss.NewFeedBuilder().WithItemProvider(rss.NewRssFeed(`http://2chav.com/?xml`)).WithImageNodeFilterStrategy(func(n *html.Node) bool {
 		parentFilter := rss.ParentNodeFilterFunc(rss.FilterByClass("kobetu_kiji"))
 		nodeFilter := rss.DefaultFilterStrategy()
 		return parentFilter(n) && nodeFilter(n)
-	}, rss.DefaultFilterStrategy(), rss.DefaultExtractionStrategy(), rss.DefaultTransformStrategy(), getChannelId, 1)
-	rss.AddFeed(rss.NewRssFeed(`https://dlsite-rss.s3-ap-northeast-1.amazonaws.com/voice_rss.xml`), rss.FilterByAttr("property", "og:image"), func(n *html.Node) bool {
+	}).WithGetChannelIdStrategy(getChannelId).Build())
+
+	rss.AddFeed(rss.NewFeedBuilder().WithItemProvider(rss.NewRssFeed(`https://dlsite-rss.s3-ap-northeast-1.amazonaws.com/voice_rss.xml`)).WithImageNodeFilterStrategy(rss.FilterByAttr("property", "og:image")).WithLogoImageNodeFilterStrategy(func(n *html.Node) bool {
 		parentFilter := rss.ParentNodeFilterFunc(rss.FilterByClass("logo"))
 		nodeFilter := rss.DefaultFilterStrategy()
 		return parentFilter(n) && nodeFilter(n)
-	}, rss.DefaultExtractionStrategy(), func(s string) string {
+	}).WithImageLinkTransformStrategy(func(s string) string {
 		if strings.HasPrefix(s, "/") {
 			return `https://www.dlsite.com` + s
 		}
 		return s
-	}, getSecondChannelId, 1)
-	rss.AddFeed(rss.NewRssFeed(`http://avohayo.blog.fc2.com/?xml`), func(n *html.Node) bool {
+	}).WithGetChannelIdStrategy(getSecondChannelId).Build())
+
+	rss.AddFeed(rss.NewFeedBuilder().WithItemProvider(rss.NewRssFeed(`http://avohayo.blog.fc2.com/?xml`)).WithImageNodeFilterStrategy(func(n *html.Node) bool {
 		parentFilter := rss.ParentNodeFilterFunc(rss.FilterByClass("entry_body"))
 		nodeFilter := rss.DefaultFilterStrategy()
 		return parentFilter(n) && nodeFilter(n)
-	}, func(n *html.Node) bool {
+	}).WithLogoImageNodeFilterStrategy(func(n *html.Node) bool {
 		parentFilter := rss.ParentNodeFilterFunc(rss.FilterByAttr("id", "sh_fc2blogheadbar_menu"))
 		nodeFilter := rss.DefaultFilterStrategy()
 		return parentFilter(n) && nodeFilter(n)
-	}, rss.DefaultExtractionStrategy(), rss.DefaultTransformStrategy(), getChannelId, 1)
+	}).WithGetChannelIdStrategy(getChannelId).Build())
 }
 
 func main() {

@@ -62,7 +62,7 @@ func init() {
 				return
 			}
 			if i.Member == nil {
-				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 					Content: "This command is only valid in guilds",
 				})
 				return
@@ -70,7 +70,7 @@ func init() {
 			vs, err := s.State.VoiceState(i.GuildID, i.Member.User.ID)
 			if err != nil {
 				log.Println(err)
-				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 					Content: "Could not grab voice state for user",
 				})
 				return
@@ -78,12 +78,12 @@ func init() {
 			err = JoinVoice(s, i.GuildID, vs.ChannelID)
 			if err != nil {
 				log.Println(err)
-				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 					Content: "Could not join voice channel",
 				})
 				return
 			}
-			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+			s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 				Content: "Joined channel",
 			})
 		},
@@ -102,12 +102,12 @@ func init() {
 			s.UpdateListeningStatus("")
 			if err != nil {
 				log.Println(err)
-				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 					Content: "Failed to leave voice channel",
 				})
 				return
 			}
-			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+			s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 				Content: ":pager: Getting paged! :pager:",
 			})
 		},
@@ -125,11 +125,11 @@ func init() {
 			url := i.ApplicationCommandData().Options[0].StringValue()
 			info, err := UrlToEmbed(url)
 			if err != nil {
-				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 					Content: "Failed to retrieve video info",
 				})
 			} else {
-				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 					Embeds: []*discordgo.MessageEmbed{info},
 				})
 			}
@@ -149,12 +149,12 @@ func init() {
 			}
 			err = Skip(i.GuildID)
 			if err != nil {
-				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 					Content: "An error occurred while attempting to skip",
 				})
 				return
 			}
-			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+			s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 				Content: "Playback has ceased for the current song",
 			})
 		},
@@ -171,12 +171,12 @@ func init() {
 			}
 			err = Pause(i.GuildID)
 			if err != nil {
-				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 					Content: "An error occurred while attempting to pause",
 				})
 				return
 			}
-			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+			s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 				Content: "Successfully toggled pause",
 			})
 		},
@@ -207,7 +207,7 @@ func init() {
 			if len(selectMenuOptions) == 0 {
 				log.Printf("recent: warning: selectMenuOptions is empty")
 			}
-			_, err = s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+			_, err = s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 				Content: "Select a track :dvd::musical_note:",
 				Components: []discordgo.MessageComponent{
 					discordgo.ActionsRow{
@@ -241,11 +241,11 @@ func init() {
 			url := i.MessageComponentData().Values[0]
 			info, err := UrlToEmbed(url)
 			if err != nil {
-				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 					Content: "Failed to retrieve video info",
 				})
 			} else {
-				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 					Embeds: []*discordgo.MessageEmbed{info},
 				})
 			}

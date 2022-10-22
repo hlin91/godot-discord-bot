@@ -50,7 +50,7 @@ func init() {
 			content := i.ApplicationCommandData().Resolved.Messages[i.ApplicationCommandData().TargetID].Content
 			codeBlocks := findCodeBlocks(content)
 			if len(codeBlocks) == 0 {
-				_, err = s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+				_, err = s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 					Content: "This message has no code blocks :page_facing_up:",
 				})
 				return
@@ -78,7 +78,7 @@ func init() {
 					Reader:      f,
 				})
 			}
-			_, err = s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+			_, err = s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 				Files: discordFiles,
 			})
 			if err != nil {

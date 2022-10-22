@@ -188,7 +188,7 @@ func streamUrlCoroutine(s *discordgo.Session, i *discordgo.InteractionCreate, ur
 		info.Author = &discordgo.MessageEmbedAuthor{
 			Name: fmt.Sprintf("Error occurred during playback: \n%v", err),
 		}
-		s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+		s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 			Embeds: []*discordgo.MessageEmbed{info},
 		})
 		return
@@ -196,7 +196,7 @@ func streamUrlCoroutine(s *discordgo.Session, i *discordgo.InteractionCreate, ur
 	info.Author = &discordgo.MessageEmbedAuthor{
 		Name: "Finished playing",
 	}
-	s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+	s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 		Embeds: []*discordgo.MessageEmbed{info},
 	})
 }

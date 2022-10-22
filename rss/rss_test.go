@@ -10,39 +10,42 @@ import (
 )
 
 func TestRssFeeds(t *testing.T) {
-	AddFeed(NewRssFeed(`http://fiu758.blog111.fc2.com/?xml`), func(n *html.Node) bool {
+	AddFeed(NewFeedBuilder().WithItemProvider(NewRssFeed(`http://fiu758.blog111.fc2.com/?xml`)).WithImageNodeFilterStrategy(func(n *html.Node) bool {
 		parentFilter := ParentNodeFilterFunc(FilterByClass("main_txt"))
 		nodeFilter := DefaultFilterStrategy()
 		return parentFilter(n) && nodeFilter(n)
-	}, func(n *html.Node) bool {
+	}).WithLogoImageNodeFilterStrategy(func(n *html.Node) bool {
 		parentFilter := ParentNodeFilterFunc(FilterByClass("sh_fc2blogheadbar_body"))
 		nodeFilter := DefaultFilterStrategy()
 		return parentFilter(n) && nodeFilter(n)
-	}, DefaultExtractionStrategy(), DefaultTransformStrategy(), func() string { return "" }, 1)
-	AddFeed(NewRssFeed(`http://2chav.com/?xml`), func(n *html.Node) bool {
+	}).Build())
+
+	AddFeed(NewFeedBuilder().WithItemProvider(NewRssFeed(`http://2chav.com/?xml`)).WithImageNodeFilterStrategy(func(n *html.Node) bool {
 		parentFilter := ParentNodeFilterFunc(FilterByClass("kobetu_kiji"))
 		nodeFilter := DefaultFilterStrategy()
 		return parentFilter(n) && nodeFilter(n)
-	}, DefaultFilterStrategy(), DefaultExtractionStrategy(), DefaultTransformStrategy(), func() string { return "" }, 1)
-	AddFeed(NewRssFeed(`https://dlsite-rss.s3-ap-northeast-1.amazonaws.com/voice_rss.xml`), FilterByAttr("property", "og:image"), func(n *html.Node) bool {
+	}).Build())
+
+	AddFeed(NewFeedBuilder().WithItemProvider(NewRssFeed(`https://dlsite-rss.s3-ap-northeast-1.amazonaws.com/voice_rss.xml`)).WithImageNodeFilterStrategy(FilterByAttr("property", "og:image")).WithLogoImageNodeFilterStrategy(func(n *html.Node) bool {
 		parentFilter := ParentNodeFilterFunc(FilterByClass("logo"))
 		nodeFilter := DefaultFilterStrategy()
 		return parentFilter(n) && nodeFilter(n)
-	}, DefaultExtractionStrategy(), func(s string) string {
+	}).WithImageLinkTransformStrategy(func(s string) string {
 		if strings.HasPrefix(s, "/") {
 			return `https://www.dlsite.com` + s
 		}
 		return s
-	}, func() string { return "" }, 1)
-	AddFeed(NewRssFeed(`http://avohayo.blog.fc2.com/?xml`), func(n *html.Node) bool {
+	}).Build())
+
+	AddFeed(NewFeedBuilder().WithItemProvider(NewRssFeed(`http://avohayo.blog.fc2.com/?xml`)).WithImageNodeFilterStrategy(func(n *html.Node) bool {
 		parentFilter := ParentNodeFilterFunc(FilterByClass("entry_body"))
 		nodeFilter := DefaultFilterStrategy()
 		return parentFilter(n) && nodeFilter(n)
-	}, func(n *html.Node) bool {
+	}).WithLogoImageNodeFilterStrategy(func(n *html.Node) bool {
 		parentFilter := ParentNodeFilterFunc(FilterByAttr("id", "sh_fc2blogheadbar_menu"))
 		nodeFilter := DefaultFilterStrategy()
 		return parentFilter(n) && nodeFilter(n)
-	}, DefaultExtractionStrategy(), DefaultTransformStrategy(), func() string { return "" }, 1)
+	}).Build())
 
 	items := GetLatest()
 	var item *gofeed.Item

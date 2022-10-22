@@ -43,7 +43,7 @@ func init() {
 					return
 				}
 			}
-			_, err = s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+			_, err = s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 				Content: fmt.Sprintf("<@%v>", i.ApplicationCommandData().TargetID),
 				Embeds:  []*discordgo.MessageEmbed{leetcodeQuestionToEmbed(questionUrl)},
 			})
@@ -71,7 +71,7 @@ func init() {
 			}
 			problem := createProblem(problemContent)
 			getProblemByInteractionId[i.Interaction.ID] = problem
-			_, err = s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+			_, err = s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 				Content: fmt.Sprintf("<@%v>\n***Pop quiz!***\n", i.ApplicationCommandData().TargetID) + markdownProblemToMessageContent(problem),
 				Components: []discordgo.MessageComponent{
 					discordgo.ActionsRow{
@@ -177,7 +177,7 @@ func init() {
 			if err != nil {
 				log.Printf("hard_lookup_solution: failed to generate response: %v", err)
 			}
-			_, err = s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+			_, err = s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 				Content: response.Content,
 				Files:   response.Files,
 			})

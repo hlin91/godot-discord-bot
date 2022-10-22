@@ -4,7 +4,7 @@ github.com/PuerkitoBio/goquery
 # github.com/andybalholm/cascadia v1.3.1
 ## explicit; go 1.16
 github.com/andybalholm/cascadia
-# github.com/bwmarrin/discordgo v0.24.0
+# github.com/bwmarrin/discordgo v0.25.0
 ## explicit; go 1.13
 github.com/bwmarrin/discordgo
 # github.com/chromedp/cdproto v0.0.0-20220131204822-e6abebe7b8cd
